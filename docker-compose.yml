@@ -1,0 +1,59 @@
+services:
+  db:
+    build:
+      context: ./database
+      dockerfile: Dockerfile
+    container_name: db
+    restart: always
+    ports:
+      - 3306:3306
+    volumes:
+      - ./database/data:/var/lib/mysql
+    networks:
+      - db
+    env_file: .env
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DB}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD}" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+  adminer:
+    image: adminer
+    container_name: adminer
+    restart: always
+    ports:
+      - 8081:8080
+    networks:
+      - db
+    depends_on:
+      db:
+        condition: service_healthy
+  fastapi:
+    build:
+      context: ./uni-schem
+      dockerfile: Dockerfile
+    container_name: fast-api
+    restart: always
+    ports:
+      - "8002:80"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - db
+    env_file: .env
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DB}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - DB_HOST=db
+
+networks:
+  db:
+    driver: bridge
