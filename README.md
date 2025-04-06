@@ -1,2 +1,2 @@
-# eam-schem
-EAM ScheM (EAM Schedule Manager) - Final project for microservices class
+  # Uni-ScheM
+Uni-ScheM (University Schedule Manager): Final project for microservices class
