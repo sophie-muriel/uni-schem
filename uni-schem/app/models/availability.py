@@ -9,7 +9,7 @@ class Availability(BaseModel):
     Attributes:
         availability_id (int): Unique identifier for the availability entry.
         professor_id (int): ID of the professor.
-        day (str): Day of the week.
+        day (Day): Day of the week (Enum).
         start_time (time): Start of availability.
         end_time (time): End of availability.
     """
