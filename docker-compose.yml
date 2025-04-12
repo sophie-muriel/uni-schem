@@ -1,59 +1,92 @@
 services:
-  db:
-    build:
-      context: ./database
-      dockerfile: Dockerfile
-    container_name: db
-    restart: always
+  traefik:
+    image: traefik:v2.10
+    container_name: traefik
+    restart: unless-stopped
     ports:
-      - 3306:3306
+      - "0.0.0.0:8085:85"
+      - "0.0.0.0:443:443"
+      - "0.0.0.0:8080:8080"
     volumes:
-      - ./database/data:/var/lib/mysql
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./traefik/config:/etc/traefik/config:ro
     networks:
-      - db
-    env_file: .env
+      - uni-schem-balancer
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: unless-stopped
     environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MYSQL_DATABASE=${MYSQL_DB}
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: mydatabase
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - uni-schem-balancer
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD}" ]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD}"]
       interval: 30s
       timeout: 10s
       retries: 5
+    labels:
+      - "traefik.enable=false"
+
   adminer:
     image: adminer
     container_name: adminer
     restart: always
     ports:
       - 8081:8080
+    environment:
+      - ADMINER_DEFAULT_SERVER=mysql
+      - ADMINER_DESIGN=flat
     networks:
-      - db
+      - uni-schem-balancer
     depends_on:
-      db:
+      mysql:
         condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.adminer.rule=PathPrefix(`/adminer`)"
+      - "traefik.http.services.adminer.loadbalancer.server.port=8080"
+      - "traefik.http.routers.adminer.entrypoints=web"
+
   fastapi:
     build:
       context: ./uni-schem
       dockerfile: Dockerfile
     container_name: fast-api
-    restart: always
-    ports:
-      - "8002:80"
-    depends_on:
-      db:
-        condition: service_healthy
+    restart: unless-stopped
     networks:
-      - db
+      - uni-schem-balancer
     env_file: .env
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_DATABASE=${MYSQL_DB}
       - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-      - DB_HOST=db
+      - DB_HOST=mysql
+    depends_on:
+      mysql:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.api.rule=PathPrefix(`/api`)"
+      - "traefik.http.routers.api.entrypoints=web"
+      - "traefik.http.services.api.loadbalancer.server.port=80"
+      - "traefik.http.routers.api.middlewares=api-strip@docker"
+      - "traefik.http.middlewares.api-strip.stripprefix.prefixes=/api"
+      - "traefik.http.middlewares.api-strip.stripprefix.forceSlash=false"
+      - "traefik.http.routers.api.middlewares=api-strip@docker"
+      - "traefik.http.middlewares.api-headers.headers.customrequestheaders.X-Forwarded-Prefix=/api"
 
 networks:
-  db:
+  uni-schem-balancer:
     driver: bridge
+
+volumes:
+  mysql_data:
