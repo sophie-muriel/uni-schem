@@ -19,19 +19,15 @@ services:
     container_name: mysql
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DB}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DB}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - DB_HOST=${MYSQL_HOST}
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
       - uni-schem-balancer
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD}"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
     labels:
       - "traefik.enable=false"
 
@@ -46,9 +42,6 @@ services:
       - ADMINER_DESIGN=flat
     networks:
       - uni-schem-balancer
-    depends_on:
-      mysql:
-        condition: service_healthy
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.adminer.rule=PathPrefix(`/adminer`)"
@@ -59,7 +52,16 @@ services:
     build:
       context: ./uni-schem
       dockerfile: Dockerfile
-    container_name: fast-api
+    deploy:
+      mode: replicated
+      replicas: 4
+      resources:
+        limits:
+          cpus: '0.75'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 512M
     restart: unless-stopped
     networks:
       - uni-schem-balancer
@@ -69,10 +71,7 @@ services:
       - MYSQL_DATABASE=${MYSQL_DB}
       - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-      - DB_HOST=mysql
-    depends_on:
-      mysql:
-        condition: service_healthy
+      - DB_HOST=${MYSQL_HOST}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.api.rule=PathPrefix(`/api`)"
