@@ -67,6 +67,8 @@ services:
       - uni-schem-balancer
     environment:
       - DATABASE_URL=mysql+pymysql://user:password@mysql:3306/mydatabase
+    depends_on:
+      - mysql
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.api.rule=PathPrefix(`/api`)"
