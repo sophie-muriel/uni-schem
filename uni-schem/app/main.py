@@ -1,6 +1,6 @@
 # main.py
 from fastapi import FastAPI
-from api.v1 import item_routes
+from app.api.v1 import item_routes
 
 app = FastAPI(
     title="Uni-ScheM",
