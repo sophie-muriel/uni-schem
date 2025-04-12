@@ -1,18 +1,10 @@
-FROM python:3.9
-
-COPY ./app /app
-COPY ./startup.sh /app
-COPY ./requirements.txt /app
+FROM python:3.9-slim
 
 WORKDIR /app
 
-RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install -y mariadb-client && \
-    pip install mysqlclient
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+	
+COPY . .
 
-RUN pip3 install --upgrade pip
-RUN pip3 install -r requirements.txt
-
-RUN chmod +x startup.sh
-CMD ["./startup.sh"]
+CMD ["gunicorn", "app.main:app", "--workers", "4", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000"]
