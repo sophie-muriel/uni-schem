@@ -1,9 +1,6 @@
 from pydantic import BaseModel, EmailStr, constr
 from typing import Optional
 
-NameStr = constr(max_length=100)
-PhoneStr = constr(max_length=15)
-
 class Student(BaseModel):
     """
     Represents a student in the academic system.
@@ -15,6 +12,6 @@ class Student(BaseModel):
         phone (Optional[str]): Contact phone number (up to 15 characters).
     """
     student_id: int
-    name: NameStr
+    name: constr(max_length=100)
     email: EmailStr
-    phone: Optional[PhoneStr]
+    phone: constr(max_length=15)
