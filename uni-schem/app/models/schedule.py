@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from datetime import time
-from .Day import Day
+from .day import Day
 
 class Schedule(BaseModel):
     """
