@@ -1,5 +1,5 @@
-from pydantic import BaseModel
 from datetime import time
+from pydantic import BaseModel
 from .day import Day
 
 class Availability(BaseModel):
@@ -8,10 +8,10 @@ class Availability(BaseModel):
 
     Attributes:
         availability_id (int): Unique identifier for the availability entry.
-        professor_id (int): ID of the professor.
-        day (Day): Day of the week (Enum).
-        start_time (time): Start of availability.
-        end_time (time): End of availability.
+        professor_id (int): ID of the professor assigned to this availability.
+        day (Day): The day of the week when the professor is available.
+        start_time (time): Start time of the availability window.
+        end_time (time): End time of the availability window.
     """
     availability_id: int
     professor_id: int
