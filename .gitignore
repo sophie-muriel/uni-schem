@@ -1,0 +1,32 @@
+# ─── Python ─────────────────────────────────────
+__pycache__/
+*.py[cod]
+.venv/
+.env
+
+# ─── Local data ─────────────────────────────────
+data/
+database/data/
+
+# ─── Docker ─────────────────────────────────────
+*.log
+docker-compose.override.yml
+**/Dockerfile~
+**/docker-compose*.yml~
+
+# ─── OS / Editor Specific ───────────────────────
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ─── Virtual environments & dependencies ────────
+*.egg-info/
+pip-log.txt
+dist/
+build/
+
+# ─── Misc ───────────────────────────────────────
+*.swp
+*.bak
+*.tmp
