@@ -1,9 +1,6 @@
 from pydantic import BaseModel, constr
 from typing import Optional
 
-NameStr = constr(max_length=50)
-LocationStr = constr(max_length=100)
-
 class Classroom(BaseModel):
     """
     Represents a physical classroom within the institution.
@@ -15,6 +12,6 @@ class Classroom(BaseModel):
         location (Optional[str]): Location or building info (up to 100 characters).
     """
     classroom_id: int
-    name: NameStr
+    name: constr(max_length=50)
     capacity: int
-    location: Optional[LocationStr]
+    location: Optional[constr(max_length=100)]
