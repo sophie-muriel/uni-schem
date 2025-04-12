@@ -13,7 +13,7 @@ jobs:
 
       - name: SSH Deploy
         env:
-          PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          PRIVATE_KEY: "${{ secrets.SSH_PRIVATE_KEY }}"
           HOST_NAME: ${{ secrets.SSH_HOST }}
           USER_NAME: ${{ secrets.USER_NAME }}
           PROJECT_PATH: ${{ secrets.PROJECT_PATH }}
@@ -21,27 +21,27 @@ jobs:
         run: |
           # Create .ssh directory
           mkdir -p ~/.ssh
-          
+
           # Write key to file and set proper permissions
           echo "$PRIVATE_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          
+
           # Add host to known hosts
           ssh-keyscan -H ${HOST_NAME} >> ~/.ssh/known_hosts
-          
+
           # Use -T flag to disable pseudo-terminal allocation
           ssh -T -o StrictHostKeyChecking=no -i ~/.ssh/deploy_key ${USER_NAME}@${HOST_NAME} <<EOF
-          if [ ! -d "${PROJECT_PATH}/.git" ]; then
-            mkdir -p \$(dirname ${PROJECT_PATH})
-            git clone ${GIT_REPO} ${PROJECT_PATH}
-          fi
+            if [ ! -d "${PROJECT_PATH}/.git" ]; then
+              mkdir -p \$(dirname ${PROJECT_PATH})
+              git clone ${GIT_REPO} ${PROJECT_PATH}
+            fi
 
-          cd ${PROJECT_PATH}
-          git checkout main
-          git fetch --all
-          git reset --hard origin/main
-          git pull origin main
-
-          docker-compose down
-          docker-compose up -d --build
+            cd ${PROJECT_PATH}
+            git checkout main
+            git fetch --all
+            git reset --hard origin/main
+            git pull origin main
+            docker-compose down
+            docker-compose up -d --build
+          
           EOF
