@@ -17,4 +17,4 @@ class Day(Enum):
     wednesday = 3
     thursday = 4
     friday = 5
-    saturday = 6  
+    saturday = 6
