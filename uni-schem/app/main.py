@@ -4,7 +4,16 @@ from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 import os
-from app.api.v1 import item_routes
+
+from app.api.v1 import (
+    availability_routes,
+    classroom_routes,
+    course_routes,
+    professor_routes,
+    schedule_routes,
+    student_course_routes,
+    student_routes
+)
 
 # Database configuration
 DATABASE_URL = os.getenv(
@@ -42,4 +51,10 @@ app = FastAPI(
     },
 )
 
-app.include_router(item_routes.router, prefix="/api/v1/item")
+app.include_router(availability_routes.router, prefix="/v1/availability")
+app.include_router(classroom_routes.router, prefix="/v1/classroom")
+app.include_router(course_routes.router, prefix="/v1/course")
+app.include_router(professor_routes.router, prefix="/v1/professor")
+app.include_router(schedule_routes.router, prefix="/v1/schedule")
+app.include_router(student_course_routes.router, prefix="/v1/student-course")
+app.include_router(student_routes.router, prefix="/v1/student")
