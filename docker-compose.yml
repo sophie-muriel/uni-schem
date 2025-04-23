@@ -82,6 +82,7 @@ services:
 
 networks:
   uni-schem-balancer:
+    name: uni-schem-balancer
     driver: bridge
 
 volumes:
