@@ -17,7 +17,7 @@ from app.api.v1 import (
 
 # Database configuration
 DATABASE_URL = os.getenv(
-    "DATABASE_URL", "mysql+pymysql://user:password@mysql:3306/mydatabase"
+    "DATABASE_URL", ""
 )
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -51,10 +51,44 @@ app = FastAPI(
     },
 )
 
-app.include_router(availability_routes.router, prefix="/v1/availability")
-app.include_router(classroom_routes.router, prefix="/v1/classroom")
-app.include_router(course_routes.router, prefix="/v1/course")
-app.include_router(professor_routes.router, prefix="/v1/professor")
-app.include_router(schedule_routes.router, prefix="/v1/schedule")
-app.include_router(student_course_routes.router, prefix="/v1/student-course")
-app.include_router(student_routes.router, prefix="/v1/student")
+app.include_router(
+    availability_routes.router,
+    prefix="/v1/availability",
+    tags=["Availability"]
+)
+
+app.include_router(
+    classroom_routes.router,
+    prefix="/v1/classroom",
+    tags=["Classroom"]
+)
+
+app.include_router(
+    course_routes.router,
+    prefix="/v1/course",
+    tags=["Course"]
+)
+
+app.include_router(
+    professor_routes.router,
+    prefix="/v1/professor",
+    tags=["Professor"]
+)
+
+app.include_router(
+    schedule_routes.router,
+    prefix="/v1/schedule",
+    tags=["Schedule"]
+)
+
+app.include_router(
+    student_course_routes.router,
+    prefix="/v1/student-course",
+    tags=["Student - Course"]
+)
+
+app.include_router(
+    student_routes.router,
+    prefix="/v1/student",
+    tags=["Student"]
+)
