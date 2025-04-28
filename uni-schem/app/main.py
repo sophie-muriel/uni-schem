@@ -15,24 +15,12 @@ from app.api.v1 import (
     student_routes
 )
 
-# Database configuration
 DATABASE_URL = os.getenv(
     "DATABASE_URL", ""
 )
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
-
-# Create tables
-Base.metadata.create_all(bind=engine)
-
-# Dependency to get DB session
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 app = FastAPI(
     title="Uni-ScheM",
@@ -53,42 +41,42 @@ app = FastAPI(
 
 app.include_router(
     availability_routes.router,
-    prefix="/v1/availability",
+    prefix="/availability",
     tags=["Availability"]
 )
 
 app.include_router(
     classroom_routes.router,
-    prefix="/v1/classroom",
+    prefix="/classroom",
     tags=["Classroom"]
 )
 
 app.include_router(
     course_routes.router,
-    prefix="/v1/course",
+    prefix="/course",
     tags=["Course"]
 )
 
 app.include_router(
     professor_routes.router,
-    prefix="/v1/professor",
+    prefix="/professor",
     tags=["Professor"]
 )
 
 app.include_router(
     schedule_routes.router,
-    prefix="/v1/schedule",
+    prefix="/schedule",
     tags=["Schedule"]
 )
 
 app.include_router(
     student_course_routes.router,
-    prefix="/v1/student-course",
+    prefix="/student-course",
     tags=["Student - Course"]
 )
 
 app.include_router(
     student_routes.router,
-    prefix="/v1/student",
+    prefix="/student",
     tags=["Student"]
 )
