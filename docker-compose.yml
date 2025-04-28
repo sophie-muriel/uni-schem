@@ -5,7 +5,7 @@ services:
     restart: unless-stopped
     ports:
       - "0.0.0.0:8085:85"
-      - "0.0.0.0:443:443"
+      - "0.0.0.0:8084:443"
       - "0.0.0.0:8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -64,7 +64,11 @@ services:
     networks:
       - uni-schem-balancer
     environment:
-      - DATABASE_URL=mysql+pymysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_HOST=${MYSQL_HOST}
+      - MYSQL_DB=${MYSQL_DB}
+      - DATABASE_URL=mysql+pymysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST}/${MYSQL_DB}
     depends_on:
       - mysql
     labels:
