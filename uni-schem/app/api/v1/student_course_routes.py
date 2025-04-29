@@ -1,11 +1,16 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
-from app.schemas.student_course import StudentCourseCreate, StudentCourseUpdate, StudentCourseOut
+from app.schemas.student_course import (
+    StudentCourseCreate,
+    StudentCourseUpdate,
+    StudentCourseOut,
+)
 from app.services import student_course_service
 from app.db.database import SessionLocal
 
 router = APIRouter()
+
 
 def get_db():
     """
@@ -19,7 +24,9 @@ def get_db():
 
 
 @router.post("/", response_model=StudentCourseOut)
-def create_student_course_route(data: StudentCourseCreate, db: Session = Depends(get_db)):
+def create_student_course_route(
+    data: StudentCourseCreate, db: Session = Depends(get_db)
+):
     """
     Create a new student-course enrollment.
     """
@@ -49,7 +56,9 @@ def get_student_course_route(relation_id: int, db: Session = Depends(get_db)):
 
 
 @router.put("/{relation_id}", response_model=StudentCourseOut)
-def update_student_course_route(relation_id: int, updates: StudentCourseUpdate, db: Session = Depends(get_db)):
+def update_student_course_route(
+    relation_id: int, updates: StudentCourseUpdate, db: Session = Depends(get_db)
+):
     """
     Update an existing student-course enrollment.
     """

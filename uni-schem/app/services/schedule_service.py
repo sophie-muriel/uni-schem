@@ -55,7 +55,9 @@ def list_schedules(db: Session) -> List[Schedule]:
     return schedule_repository.get_all_schedules(db)
 
 
-def modify_schedule(db: Session, schedule_id: int, updates: ScheduleUpdate) -> Optional[Schedule]:
+def modify_schedule(
+    db: Session, schedule_id: int, updates: ScheduleUpdate
+) -> Optional[Schedule]:
     """
     Updates an existing schedule with new data.
 
@@ -67,7 +69,9 @@ def modify_schedule(db: Session, schedule_id: int, updates: ScheduleUpdate) -> O
     Returns:
         Optional[Schedule]: The updated schedule or None if not found.
     """
-    return schedule_repository.update_schedule(db, schedule_id, updates.dict(exclude_unset=True))
+    return schedule_repository.update_schedule(
+        db, schedule_id, updates.dict(exclude_unset=True)
+    )
 
 
 def remove_schedule(db: Session, schedule_id: int) -> bool:

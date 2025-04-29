@@ -31,7 +31,11 @@ def get_availability_by_id(db: Session, availability_id: int) -> Optional[Availa
     Returns:
         Optional[Availability]: The availability if found, else None.
     """
-    return db.query(Availability).filter(Availability.availability_id == availability_id).first()
+    return (
+        db.query(Availability)
+        .filter(Availability.availability_id == availability_id)
+        .first()
+    )
 
 
 def get_all_availabilities(db: Session) -> List[Availability]:
@@ -47,7 +51,9 @@ def get_all_availabilities(db: Session) -> List[Availability]:
     return db.query(Availability).all()
 
 
-def update_availability(db: Session, availability_id: int, updates: dict) -> Optional[Availability]:
+def update_availability(
+    db: Session, availability_id: int, updates: dict
+) -> Optional[Availability]:
     """
     Updates an availability entry.
 

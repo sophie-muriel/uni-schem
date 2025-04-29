@@ -10,8 +10,7 @@ MYSQL_HOST = os.getenv("MYSQL_HOST")
 MYSQL_DB = os.getenv("MYSQL_DB")
 
 if not all([MYSQL_USER, MYSQL_PASSWORD, MYSQL_HOST, MYSQL_DB]):
-    raise ValueError(
-        "Missing MySQL environment variables. Check Docker setup.")
+    raise ValueError("Missing MySQL environment variables. Check Docker setup.")
 
 DATABASE_URL = f"mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}/{MYSQL_DB}"
 

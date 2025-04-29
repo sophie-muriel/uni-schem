@@ -1,11 +1,16 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
-from app.schemas.availability import AvailabilityCreate, AvailabilityUpdate, AvailabilityOut
+from app.schemas.availability import (
+    AvailabilityCreate,
+    AvailabilityUpdate,
+    AvailabilityOut,
+)
 from app.services import availability_service
 from app.db.database import SessionLocal
 
 router = APIRouter()
+
 
 def get_db():
     """
@@ -49,7 +54,9 @@ def get_availability_route(availability_id: int, db: Session = Depends(get_db)):
 
 
 @router.put("/{availability_id}", response_model=AvailabilityOut)
-def update_availability_route(availability_id: int, updates: AvailabilityUpdate, db: Session = Depends(get_db)):
+def update_availability_route(
+    availability_id: int, updates: AvailabilityUpdate, db: Session = Depends(get_db)
+):
     """
     Update a professor's availability.
     """

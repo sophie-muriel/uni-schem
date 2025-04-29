@@ -7,6 +7,7 @@ from app.db.database import SessionLocal
 
 router = APIRouter()
 
+
 def get_db():
     """
     Dependency that provides a SQLAlchemy database session.
@@ -73,7 +74,9 @@ def get_student_route(student_id: int, db: Session = Depends(get_db)):
 
 
 @router.put("/{student_id}", response_model=StudentOut)
-def update_student_route(student_id: int, updates: StudentUpdate, db: Session = Depends(get_db)):
+def update_student_route(
+    student_id: int, updates: StudentUpdate, db: Session = Depends(get_db)
+):
     """
     Update an existing student's information.
 

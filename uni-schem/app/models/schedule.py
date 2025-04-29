@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from datetime import time
 from .day import Day
 
+
 class Schedule(BaseModel):
     """
     Represents the schedule for a course in a specific classroom.
@@ -14,6 +15,7 @@ class Schedule(BaseModel):
         end_time (time): End time of the session.
         classroom_id (int): ID of the classroom assigned.
     """
+
     schedule_id: int
     course_id: int
     day: Day

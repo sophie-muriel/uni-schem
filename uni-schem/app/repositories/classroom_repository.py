@@ -47,7 +47,9 @@ def get_all_classrooms(db: Session) -> List[Classroom]:
     return db.query(Classroom).all()
 
 
-def update_classroom(db: Session, classroom_id: int, updates: dict) -> Optional[Classroom]:
+def update_classroom(
+    db: Session, classroom_id: int, updates: dict
+) -> Optional[Classroom]:
     """
     Updates an existing classroom.
 

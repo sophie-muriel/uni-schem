@@ -1,6 +1,7 @@
 from pydantic import BaseModel, constr
 from typing import Optional
 
+
 class Classroom(BaseModel):
     """
     Represents a physical classroom within the institution.
@@ -11,6 +12,7 @@ class Classroom(BaseModel):
         capacity (int): Maximum number of students the classroom can hold.
         location (Optional[str]): Location or building info (up to 100 characters).
     """
+
     classroom_id: int
     name: constr(max_length=50)
     capacity: int

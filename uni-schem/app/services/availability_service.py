@@ -41,7 +41,9 @@ def list_availabilities(db: Session) -> List[Availability]:
     return availability_repository.get_all_availabilities(db)
 
 
-def modify_availability(db: Session, availability_id: int, updates: AvailabilityUpdate) -> Optional[Availability]:
+def modify_availability(
+    db: Session, availability_id: int, updates: AvailabilityUpdate
+) -> Optional[Availability]:
     """
     Updates an availability entry.
 
@@ -53,7 +55,9 @@ def modify_availability(db: Session, availability_id: int, updates: Availability
     Returns:
         Optional[Availability]: Updated record or None if not found.
     """
-    return availability_repository.update_availability(db, availability_id, updates.dict(exclude_unset=True))
+    return availability_repository.update_availability(
+        db, availability_id, updates.dict(exclude_unset=True)
+    )
 
 
 def remove_availability(db: Session, availability_id: int) -> bool:

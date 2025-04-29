@@ -41,11 +41,15 @@ def list_courses(db: Session) -> List[Course]:
     return course_repository.get_all_courses(db)
 
 
-def modify_course(db: Session, course_id: int, updates: CourseUpdate) -> Optional[Course]:
+def modify_course(
+    db: Session, course_id: int, updates: CourseUpdate
+) -> Optional[Course]:
     """
     Updates a course with new data.
     """
-    return course_repository.update_course(db, course_id, updates.dict(exclude_unset=True))
+    return course_repository.update_course(
+        db, course_id, updates.dict(exclude_unset=True)
+    )
 
 
 def remove_course(db: Session, course_id: int) -> bool:

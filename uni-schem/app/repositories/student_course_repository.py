@@ -31,7 +31,11 @@ def get_student_course_by_id(db: Session, relation_id: int) -> Optional[StudentC
     Returns:
         Optional[StudentCourse]: The enrollment if found, else None.
     """
-    return db.query(StudentCourse).filter(StudentCourse.student_course_id == relation_id).first()
+    return (
+        db.query(StudentCourse)
+        .filter(StudentCourse.student_course_id == relation_id)
+        .first()
+    )
 
 
 def get_all_student_courses(db: Session) -> List[StudentCourse]:
@@ -47,7 +51,9 @@ def get_all_student_courses(db: Session) -> List[StudentCourse]:
     return db.query(StudentCourse).all()
 
 
-def update_student_course(db: Session, relation_id: int, updates: dict) -> Optional[StudentCourse]:
+def update_student_course(
+    db: Session, relation_id: int, updates: dict
+) -> Optional[StudentCourse]:
     """
     Updates an existing enrollment.
 

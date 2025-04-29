@@ -19,7 +19,9 @@ def register_student_course(db: Session, data: StudentCourseCreate) -> StudentCo
     Raises:
         ValueError: If an enrollment with the same ID already exists.
     """
-    existing = student_course_repository.get_student_course_by_id(db, data.student_course_id)
+    existing = student_course_repository.get_student_course_by_id(
+        db, data.student_course_id
+    )
     if existing:
         raise ValueError("This student-course enrollment already exists.")
 
@@ -41,11 +43,15 @@ def list_student_courses(db: Session) -> List[StudentCourse]:
     return student_course_repository.get_all_student_courses(db)
 
 
-def modify_student_course(db: Session, relation_id: int, updates: StudentCourseUpdate) -> Optional[StudentCourse]:
+def modify_student_course(
+    db: Session, relation_id: int, updates: StudentCourseUpdate
+) -> Optional[StudentCourse]:
     """
     Updates an existing enrollment.
     """
-    return student_course_repository.update_student_course(db, relation_id, updates.dict(exclude_unset=True))
+    return student_course_repository.update_student_course(
+        db, relation_id, updates.dict(exclude_unset=True)
+    )
 
 
 def remove_student_course(db: Session, relation_id: int) -> bool:

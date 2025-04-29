@@ -55,7 +55,9 @@ def list_professors(db: Session) -> List[Professor]:
     return professor_repository.get_all_professors(db)
 
 
-def modify_professor(db: Session, professor_id: int, updates: ProfessorUpdate) -> Optional[Professor]:
+def modify_professor(
+    db: Session, professor_id: int, updates: ProfessorUpdate
+) -> Optional[Professor]:
     """
     Updates a professor's information.
 
@@ -67,7 +69,9 @@ def modify_professor(db: Session, professor_id: int, updates: ProfessorUpdate) -
     Returns:
         Optional[Professor]: Updated professor if found, else None.
     """
-    return professor_repository.update_professor(db, professor_id, updates.dict(exclude_unset=True))
+    return professor_repository.update_professor(
+        db, professor_id, updates.dict(exclude_unset=True)
+    )
 
 
 def remove_professor(db: Session, professor_id: int) -> bool:

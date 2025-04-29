@@ -47,7 +47,9 @@ def get_all_professors(db: Session) -> List[Professor]:
     return db.query(Professor).all()
 
 
-def update_professor(db: Session, professor_id: int, updates: dict) -> Optional[Professor]:
+def update_professor(
+    db: Session, professor_id: int, updates: dict
+) -> Optional[Professor]:
     """
     Updates an existing professor's data.
 

@@ -51,7 +51,9 @@ def get_course_route(course_id: int, db: Session = Depends(get_db)):
 
 
 @router.put("/{course_id}", response_model=CourseOut)
-def update_course_route(course_id: int, updates: CourseUpdate, db: Session = Depends(get_db)):
+def update_course_route(
+    course_id: int, updates: CourseUpdate, db: Session = Depends(get_db)
+):
     """
     Update an existing course.
     """

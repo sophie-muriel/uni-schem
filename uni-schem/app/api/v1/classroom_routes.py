@@ -7,6 +7,7 @@ from app.db.database import SessionLocal
 
 router = APIRouter()
 
+
 def get_db():
     """
     Provides a SQLAlchemy database session to endpoints.
@@ -49,7 +50,9 @@ def get_classroom_route(classroom_id: int, db: Session = Depends(get_db)):
 
 
 @router.put("/{classroom_id}", response_model=ClassroomOut)
-def update_classroom_route(classroom_id: int, updates: ClassroomUpdate, db: Session = Depends(get_db)):
+def update_classroom_route(
+    classroom_id: int, updates: ClassroomUpdate, db: Session = Depends(get_db)
+):
     """
     Update an existing classroom.
     """

@@ -51,7 +51,9 @@ def get_schedule_route(schedule_id: int, db: Session = Depends(get_db)):
 
 
 @router.put("/{schedule_id}", response_model=ScheduleOut)
-def update_schedule_route(schedule_id: int, updates: ScheduleUpdate, db: Session = Depends(get_db)):
+def update_schedule_route(
+    schedule_id: int, updates: ScheduleUpdate, db: Session = Depends(get_db)
+):
     """
     Update an existing schedule entry.
     """

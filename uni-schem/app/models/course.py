@@ -1,5 +1,6 @@
 from pydantic import BaseModel, constr
 
+
 class Course(BaseModel):
     """
     Represents a course taught by a professor.
@@ -11,6 +12,7 @@ class Course(BaseModel):
         semester (str): Semester when the course is offered.
         professor_id (int): The ID of the professor assigned to the course.
     """
+
     course_id: int
     name: constr(max_length=100)
     code: constr(max_length=20)

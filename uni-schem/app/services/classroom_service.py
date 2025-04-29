@@ -41,7 +41,9 @@ def list_classrooms(db: Session) -> List[Classroom]:
     return classroom_repository.get_all_classrooms(db)
 
 
-def modify_classroom(db: Session, classroom_id: int, updates: ClassroomUpdate) -> Optional[Classroom]:
+def modify_classroom(
+    db: Session, classroom_id: int, updates: ClassroomUpdate
+) -> Optional[Classroom]:
     """
     Updates an existing classroom.
 
@@ -53,7 +55,9 @@ def modify_classroom(db: Session, classroom_id: int, updates: ClassroomUpdate) -
     Returns:
         Optional[Classroom]: The updated classroom or None if not found.
     """
-    return classroom_repository.update_classroom(db, classroom_id, updates.dict(exclude_unset=True))
+    return classroom_repository.update_classroom(
+        db, classroom_id, updates.dict(exclude_unset=True)
+    )
 
 
 def remove_classroom(db: Session, classroom_id: int) -> bool:

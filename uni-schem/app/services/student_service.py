@@ -4,6 +4,7 @@ from app.schemas.student import StudentCreate, StudentUpdate
 from app.repositories import student_repository
 from typing import List, Optional
 
+
 def register_student(db: Session, student: StudentCreate) -> Student:
     """
     Registers a new student after verifying they do not already exist.
@@ -39,12 +40,16 @@ def list_students(db: Session) -> List[Student]:
     return student_repository.get_all_students(db)
 
 
-def modify_student(db: Session, student_id: int, updates: StudentUpdate) -> Optional[Student]:
+def modify_student(
+    db: Session, student_id: int, updates: StudentUpdate
+) -> Optional[Student]:
     """
     Updates the student with the provided data.
     """
-    return student_repository.update_student(db, student_id, updates.dict(exclude_unset=True))
-    
+    return student_repository.update_student(
+        db, student_id, updates.dict(exclude_unset=True)
+    )
+
 
 def remove_student(db: Session, student_id: int) -> bool:
     """

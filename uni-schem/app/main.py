@@ -12,12 +12,10 @@ from app.api.v1 import (
     professor_routes,
     schedule_routes,
     student_course_routes,
-    student_routes
+    student_routes,
 )
 
-DATABASE_URL = os.getenv(
-    "DATABASE_URL", ""
-)
+DATABASE_URL = os.getenv("DATABASE_URL", "")
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
@@ -27,7 +25,7 @@ app = FastAPI(
     description="University Schedule Manager",
     contact={
         "name": "Sophie Muriel",
-        "url": "https://github.com/sophie-muriel/uni-schem"
+        "url": "https://github.com/sophie-muriel/uni-schem",
     },
     root_path="/api",
     docs_url="/docs",
@@ -40,43 +38,19 @@ app = FastAPI(
 )
 
 app.include_router(
-    availability_routes.router,
-    prefix="/availability",
-    tags=["Availability"]
+    availability_routes.router, prefix="/availability", tags=["Availability"]
 )
 
-app.include_router(
-    classroom_routes.router,
-    prefix="/classroom",
-    tags=["Classroom"]
-)
+app.include_router(classroom_routes.router, prefix="/classroom", tags=["Classroom"])
+
+app.include_router(course_routes.router, prefix="/course", tags=["Course"])
+
+app.include_router(professor_routes.router, prefix="/professor", tags=["Professor"])
+
+app.include_router(schedule_routes.router, prefix="/schedule", tags=["Schedule"])
 
 app.include_router(
-    course_routes.router,
-    prefix="/course",
-    tags=["Course"]
+    student_course_routes.router, prefix="/student-course", tags=["Student - Course"]
 )
 
-app.include_router(
-    professor_routes.router,
-    prefix="/professor",
-    tags=["Professor"]
-)
-
-app.include_router(
-    schedule_routes.router,
-    prefix="/schedule",
-    tags=["Schedule"]
-)
-
-app.include_router(
-    student_course_routes.router,
-    prefix="/student-course",
-    tags=["Student - Course"]
-)
-
-app.include_router(
-    student_routes.router,
-    prefix="/student",
-    tags=["Student"]
-)
+app.include_router(student_routes.router, prefix="/student", tags=["Student"])

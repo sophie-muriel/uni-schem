@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from app.models.student import Student
 from typing import List, Optional
 
+
 def create_student(db: Session, student: Student) -> Student:
     """
     Adds a new student to the database.
@@ -46,7 +47,9 @@ def get_all_students(db: Session) -> List[Student]:
     return db.query(Student).all()
 
 
-def update_student(db: Session, student_id: int, updated_data: dict) -> Optional[Student]:
+def update_student(
+    db: Session, student_id: int, updated_data: dict
+) -> Optional[Student]:
     """
     Updates a student by ID.
 
