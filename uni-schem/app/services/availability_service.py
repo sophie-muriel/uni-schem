@@ -1,5 +1,5 @@
-from sqlalchemy.orm import Session
 from typing import List, Optional
+from sqlalchemy.orm import Session
 from app.models.availability import Availability
 from app.schemas.availability import AvailabilityCreate, AvailabilityUpdate
 from app.repositories import availability_repository
@@ -19,7 +19,8 @@ def register_availability(db: Session, data: AvailabilityCreate) -> Availability
     Raises:
         ValueError: If an entry with the same ID already exists.
     """
-    existing = availability_repository.get_availability_by_id(db, data.availability_id)
+    existing = availability_repository.get_availability_by_id(
+        db, data.availability_id)
     if existing:
         raise ValueError("Availability with this ID already exists.")
 

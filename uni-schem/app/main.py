@@ -1,9 +1,9 @@
 # main.py
-from fastapi import FastAPI, Depends, HTTPException
-from sqlalchemy import create_engine, Column, Integer, String
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session
 import os
+from fastapi import FastAPI
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
 from app.api.v1 import (
     availability_routes,
@@ -41,13 +41,16 @@ app.include_router(
     availability_routes.router, prefix="/availability", tags=["Availability"]
 )
 
-app.include_router(classroom_routes.router, prefix="/classroom", tags=["Classroom"])
+app.include_router(classroom_routes.router,
+                   prefix="/classroom", tags=["Classroom"])
 
 app.include_router(course_routes.router, prefix="/course", tags=["Course"])
 
-app.include_router(professor_routes.router, prefix="/professor", tags=["Professor"])
+app.include_router(professor_routes.router,
+                   prefix="/professor", tags=["Professor"])
 
-app.include_router(schedule_routes.router, prefix="/schedule", tags=["Schedule"])
+app.include_router(schedule_routes.router,
+                   prefix="/schedule", tags=["Schedule"])
 
 app.include_router(
     student_course_routes.router, prefix="/student-course", tags=["Student - Course"]

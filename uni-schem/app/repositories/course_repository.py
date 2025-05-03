@@ -1,6 +1,6 @@
+from typing import List, Optional
 from sqlalchemy.orm import Session
 from app.models.course import Course
-from typing import List, Optional
 
 
 def create_course(db: Session, course: Course) -> Course:

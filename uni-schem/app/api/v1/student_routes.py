@@ -1,6 +1,6 @@
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List
 from app.schemas.student import StudentCreate, StudentUpdate, StudentOut
 from app.services import student_service
 from app.db.database import SessionLocal
@@ -35,7 +35,7 @@ def create_student_route(student: StudentCreate, db: Session = Depends(get_db)):
     try:
         return student_service.register_student(db, student)
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
 
 @router.get("/", response_model=List[StudentOut])

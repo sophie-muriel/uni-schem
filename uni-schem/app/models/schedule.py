@@ -1,5 +1,5 @@
-from pydantic import BaseModel
 from datetime import time
+from pydantic import BaseModel
 from .day import Day
 
 

@@ -1,5 +1,5 @@
-from sqlalchemy.orm import Session
 from typing import List, Optional
+from sqlalchemy.orm import Session
 
 from app.models.schedule import Schedule
 from app.schemas.schedule import ScheduleCreate, ScheduleUpdate
@@ -20,7 +20,8 @@ def register_schedule(db: Session, schedule_data: ScheduleCreate) -> Schedule:
     Raises:
         ValueError: If a schedule with the same ID already exists.
     """
-    existing = schedule_repository.get_schedule_by_id(db, schedule_data.schedule_id)
+    existing = schedule_repository.get_schedule_by_id(
+        db, schedule_data.schedule_id)
     if existing:
         raise ValueError("Schedule with this ID already exists.")
 

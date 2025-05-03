@@ -1,6 +1,6 @@
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List
 
 from app.schemas.professor import ProfessorCreate, ProfessorUpdate, ProfessorOut
 from app.services import professor_service
@@ -28,7 +28,7 @@ def create_professor_route(professor: ProfessorCreate, db: Session = Depends(get
     try:
         return professor_service.register_professor(db, professor)
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
 
 @router.get("/", response_model=List[ProfessorOut])

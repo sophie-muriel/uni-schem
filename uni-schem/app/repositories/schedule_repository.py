@@ -1,6 +1,6 @@
+from typing import List, Optional
 from sqlalchemy.orm import Session
 from app.models.schedule import Schedule
-from typing import List, Optional
 
 
 def create_schedule(db: Session, schedule: Schedule) -> Schedule:

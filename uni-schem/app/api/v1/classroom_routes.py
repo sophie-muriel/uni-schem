@@ -1,6 +1,6 @@
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List
 from app.schemas.classroom import ClassroomCreate, ClassroomUpdate, ClassroomOut
 from app.services import classroom_service
 from app.db.database import SessionLocal
@@ -27,7 +27,7 @@ def create_classroom_route(data: ClassroomCreate, db: Session = Depends(get_db))
     try:
         return classroom_service.register_classroom(db, data)
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
 
 @router.get("/", response_model=List[ClassroomOut])

@@ -1,8 +1,8 @@
+from typing import List, Optional
 from sqlalchemy.orm import Session
 from app.models.student import Student
 from app.schemas.student import StudentCreate, StudentUpdate
 from app.repositories import student_repository
-from typing import List, Optional
 
 
 def register_student(db: Session, student: StudentCreate) -> Student:

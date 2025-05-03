@@ -1,5 +1,5 @@
-from sqlalchemy.orm import Session
 from typing import List, Optional
+from sqlalchemy.orm import Session
 
 from app.models.professor import Professor
 from app.schemas.professor import ProfessorCreate, ProfessorUpdate
@@ -20,7 +20,8 @@ def register_professor(db: Session, professor_data: ProfessorCreate) -> Professo
     Raises:
         ValueError: If a professor with the same ID already exists.
     """
-    existing = professor_repository.get_professor_by_id(db, professor_data.professor_id)
+    existing = professor_repository.get_professor_by_id(
+        db, professor_data.professor_id)
     if existing:
         raise ValueError("Professor with this ID already exists.")
 

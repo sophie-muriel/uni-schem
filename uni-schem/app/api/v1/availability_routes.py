@@ -1,6 +1,6 @@
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List
 from app.schemas.availability import (
     AvailabilityCreate,
     AvailabilityUpdate,
@@ -31,7 +31,7 @@ def create_availability_route(data: AvailabilityCreate, db: Session = Depends(ge
     try:
         return availability_service.register_availability(db, data)
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
 
 @router.get("/", response_model=List[AvailabilityOut])
@@ -60,7 +60,8 @@ def update_availability_route(
     """
     Update a professor's availability.
     """
-    updated = availability_service.modify_availability(db, availability_id, updates)
+    updated = availability_service.modify_availability(
+        db, availability_id, updates)
     if not updated:
         raise HTTPException(status_code=404, detail="Availability not found")
     return updated

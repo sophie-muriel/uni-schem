@@ -1,6 +1,5 @@
-from pydantic import BaseModel, EmailStr, constr, field_validator
-from typing import Optional
 import re
+from pydantic import BaseModel, EmailStr, constr, field_validator
 
 
 class Professor(BaseModel):
@@ -35,5 +34,6 @@ class Professor(BaseModel):
         Custom validator to ensure the name contains only letters, spaces, and apostrophes.
         """
         if not re.match(r"^[A-Za-z\s']+$", v):
-            raise ValueError("Name must only contain letters, spaces, or apostrophes")
+            raise ValueError(
+                "Name must only contain letters, spaces, or apostrophes")
         return v

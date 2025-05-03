@@ -1,6 +1,6 @@
+from typing import List, Optional
 from sqlalchemy.orm import Session
 from app.models.availability import Availability
-from typing import List, Optional
 
 
 def create_availability(db: Session, availability: Availability) -> Availability:

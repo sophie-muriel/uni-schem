@@ -1,5 +1,5 @@
-from sqlalchemy.orm import Session
 from typing import List, Optional
+from sqlalchemy.orm import Session
 from app.models.student_course import StudentCourse
 from app.schemas.student_course import StudentCourseCreate, StudentCourseUpdate
 from app.repositories import student_course_repository

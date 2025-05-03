@@ -1,6 +1,6 @@
+from typing import List, Optional
 from sqlalchemy.orm import Session
 from app.models.classroom import Classroom
-from typing import List, Optional
 
 
 def create_classroom(db: Session, classroom: Classroom) -> Classroom:

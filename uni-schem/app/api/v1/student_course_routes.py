@@ -1,6 +1,6 @@
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List
 from app.schemas.student_course import (
     StudentCourseCreate,
     StudentCourseUpdate,
@@ -33,7 +33,7 @@ def create_student_course_route(
     try:
         return student_course_service.register_student_course(db, data)
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
 
 @router.get("/", response_model=List[StudentCourseOut])
@@ -62,7 +62,8 @@ def update_student_course_route(
     """
     Update an existing student-course enrollment.
     """
-    updated = student_course_service.modify_student_course(db, relation_id, updates)
+    updated = student_course_service.modify_student_course(
+        db, relation_id, updates)
     if not updated:
         raise HTTPException(status_code=404, detail="Enrollment not found")
     return updated

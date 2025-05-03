@@ -1,6 +1,7 @@
+
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List
 
 from app.schemas.schedule import ScheduleCreate, ScheduleUpdate, ScheduleOut
 from app.services import schedule_service
@@ -28,7 +29,7 @@ def create_schedule_route(schedule: ScheduleCreate, db: Session = Depends(get_db
     try:
         return schedule_service.register_schedule(db, schedule)
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
 
 
 @router.get("/", response_model=List[ScheduleOut])
