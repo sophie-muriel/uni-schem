@@ -1,18 +1,26 @@
-from pydantic import BaseModel, EmailStr, constr
+from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import relationship
+from app.db.database import Base
 
-
-class Student(BaseModel):
+class Student(Base):
     """
     Represents a student in the academic system.
 
     Attributes:
         student_id (int): Unique identifier for the student.
         name (str): Full name of the student.
-        email (EmailStr): Valid email address of the student.
-        phone (Optional[str]): Contact phone number (up to 15 characters).
-    """
+        email (str): Valid email address of the student.
+        phone (str): Contact phone number (up to 15 characters).
 
-    student_id: int
-    name: constr(max_length=100)
-    email: EmailStr
-    phone: constr(max_length=15)
+    Relationships:
+        enrollments (List[StudentCourse]): Courses the student is enrolled in.
+    """
+    __tablename__ = "student"
+
+    student_id = Column(Integer, primary_key=True, index=True)
+    name       = Column(String(100), nullable=False)
+    email      = Column(String(320), unique=True, nullable=False)
+    phone      = Column(String(15), nullable=True)
+
+    # Relationship back to StudentCourse (enrollments)
+    enrollments = relationship("StudentCourse", back_populates="student")
