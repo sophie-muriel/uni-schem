@@ -4,7 +4,6 @@ from app.models.availability import Availability
 from app.schemas.availability import AvailabilityCreate, AvailabilityUpdate
 from app.repositories import availability_repository
 
-
 def register_availability(db: Session, data: AvailabilityCreate) -> Availability:
     """
     Registers a new availability entry for a professor.
@@ -15,16 +14,13 @@ def register_availability(db: Session, data: AvailabilityCreate) -> Availability
 
     Returns:
         Availability: The newly created availability.
-
-    Raises:
-        ValueError: If an entry with the same ID already exists.
     """
-    existing = availability_repository.get_availability_by_id(
-        db, data.availability_id)
-    if existing:
-        raise ValueError("Availability with this ID already exists.")
-
-    new_availability = Availability(**data.dict())
+    new_availability = Availability(
+        professor_id=data.professor_id,
+        day=data.day,
+        start_time=data.start_time,
+        end_time=data.end_time,
+    )
     return availability_repository.create_availability(db, new_availability)
 
 
@@ -47,14 +43,6 @@ def modify_availability(
 ) -> Optional[Availability]:
     """
     Updates an availability entry.
-
-    Args:
-        db (Session): SQLAlchemy session.
-        availability_id (int): ID of the availability to update.
-        updates (AvailabilityUpdate): Data to update.
-
-    Returns:
-        Optional[Availability]: Updated record or None if not found.
     """
     return availability_repository.update_availability(
         db, availability_id, updates.dict(exclude_unset=True)
@@ -64,12 +52,5 @@ def modify_availability(
 def remove_availability(db: Session, availability_id: int) -> bool:
     """
     Deletes an availability entry.
-
-    Args:
-        db (Session): SQLAlchemy session.
-        availability_id (int): ID of the availability to delete.
-
-    Returns:
-        bool: True if deleted, False otherwise.
     """
     return availability_repository.delete_availability(db, availability_id)
