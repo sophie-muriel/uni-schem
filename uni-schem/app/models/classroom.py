@@ -1,8 +1,9 @@
-from typing import Optional
-from pydantic import BaseModel, constr
+from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import relationship
+from app.db.database import Base
 
 
-class Classroom(BaseModel):
+class Classroom(Base):
     """
     Represents a physical classroom within the institution.
 
@@ -11,9 +12,16 @@ class Classroom(BaseModel):
         name (str): Name or number of the classroom (max 50 characters).
         capacity (int): Maximum number of students the classroom can hold.
         location (Optional[str]): Location or building info (up to 100 characters).
-    """
 
-    classroom_id: int
-    name: constr(max_length=50)
-    capacity: int
-    location: Optional[constr(max_length=100)]
+    Relationships:
+        schedules (List[Schedule]): List of schedule entries assigned to this classroom.
+    """
+    __tablename__ = "classroom"
+
+    classroom_id = Column(Integer, primary_key=True, index=True)
+    name         = Column(String(50), nullable=False)
+    capacity     = Column(Integer, nullable=False)
+    location     = Column(String(100), nullable=True)
+
+    # Relationship back to Schedule
+    schedules = relationship("Schedule", back_populates="classroom")
