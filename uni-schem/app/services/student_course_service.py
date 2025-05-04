@@ -4,7 +4,6 @@ from app.models.student_course import StudentCourse
 from app.schemas.student_course import StudentCourseCreate, StudentCourseUpdate
 from app.repositories import student_course_repository
 
-
 def register_student_course(db: Session, data: StudentCourseCreate) -> StudentCourse:
     """
     Registers a new student-course enrollment.
@@ -15,19 +14,12 @@ def register_student_course(db: Session, data: StudentCourseCreate) -> StudentCo
 
     Returns:
         StudentCourse: The created enrollment.
-
-    Raises:
-        ValueError: If an enrollment with the same ID already exists.
     """
-    existing = student_course_repository.get_student_course_by_id(
-        db, data.student_course_id
+    new_relation = StudentCourse(
+        student_id=data.student_id,
+        course_id=data.course_id
     )
-    if existing:
-        raise ValueError("This student-course enrollment already exists.")
-
-    new_relation = StudentCourse(**data.dict())
     return student_course_repository.create_student_course(db, new_relation)
-
 
 def get_student_course(db: Session, relation_id: int) -> Optional[StudentCourse]:
     """
@@ -35,13 +27,11 @@ def get_student_course(db: Session, relation_id: int) -> Optional[StudentCourse]
     """
     return student_course_repository.get_student_course_by_id(db, relation_id)
 
-
 def list_student_courses(db: Session) -> List[StudentCourse]:
     """
     Retrieves all student-course enrollments.
     """
     return student_course_repository.get_all_student_courses(db)
-
 
 def modify_student_course(
     db: Session, relation_id: int, updates: StudentCourseUpdate
@@ -52,7 +42,6 @@ def modify_student_course(
     return student_course_repository.update_student_course(
         db, relation_id, updates.dict(exclude_unset=True)
     )
-
 
 def remove_student_course(db: Session, relation_id: int) -> bool:
     """
