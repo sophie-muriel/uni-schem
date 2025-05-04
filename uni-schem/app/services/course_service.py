@@ -4,26 +4,24 @@ from app.models.course import Course
 from app.schemas.course import CourseCreate, CourseUpdate
 from app.repositories import course_repository
 
-
-def register_course(db: Session, course_data: CourseCreate) -> Course:
+def register_course(db: Session, data: CourseCreate) -> Course:
     """
-    Registers a new course after validating it doesn't already exist.
+    Registers a new course.
 
     Args:
         db (Session): SQLAlchemy session.
-        course_data (CourseCreate): Incoming course data.
+        data (CourseCreate): Incoming course data.
 
     Returns:
         Course: The newly created course.
-
-    Raises:
-        ValueError: If a course with the same ID already exists.
     """
-    existing = course_repository.get_course_by_id(db, course_data.course_id)
-    if existing:
-        raise ValueError("Course with this ID already exists.")
-
-    new_course = Course(**course_data.dict())
+    # Crea la instancia sin course_id (lo asigna la BD)
+    new_course = Course(
+        name=data.name,
+        code=data.code,
+        semester=data.semester,
+        professor_id=data.professor_id,
+    )
     return course_repository.create_course(db, new_course)
 
 
