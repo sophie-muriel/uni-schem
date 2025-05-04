@@ -1,12 +1,15 @@
 from typing import Optional
 from pydantic import BaseModel, EmailStr, constr
 
-
 class StudentBase(BaseModel):
     """
-    Shared attributes for Student.
-    """
+    Shared attributes for student models.
 
+    Attributes:
+        name (str): Full name of the student (max 100 characters).
+        email (EmailStr): Valid email address of the student.
+        phone (Optional[str]): Contact phone number (up to 15 characters).
+    """
     name: constr(max_length=100)
     email: EmailStr
     phone: Optional[constr(max_length=15)] = None
@@ -14,17 +17,21 @@ class StudentBase(BaseModel):
 
 class StudentCreate(StudentBase):
     """
-    Schema used to create a new student.
+    Schema for creating a new student.
+    Inherits: name, email, phone from StudentBase.
     """
-
-    student_id: int
+    pass
 
 
 class StudentUpdate(BaseModel):
     """
-    Schema used to update student data. All fields are optional.
-    """
+    Schema for updating student data. All fields optional.
 
+    Attributes:
+        name (Optional[str]): Updated full name of the student.
+        email (Optional[EmailStr]): Updated email address.
+        phone (Optional[str]): Updated contact phone number.
+    """
     name: Optional[constr(max_length=100)] = None
     email: Optional[EmailStr] = None
     phone: Optional[constr(max_length=15)] = None
@@ -32,10 +39,12 @@ class StudentUpdate(BaseModel):
 
 class StudentOut(StudentBase):
     """
-    Schema used to return student data in API responses.
-    """
+    Schema used for returning student data in API responses.
 
+    Adds:
+        student_id (int): Unique identifier for the student.
+    """
     student_id: int
 
     class Config:
-        orm_mode = True  # Needed for SQLAlchemy model conversion
+        orm_mode = True
