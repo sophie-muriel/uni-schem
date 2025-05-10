@@ -1,0 +1,2 @@
+[MASTER]
+disable = no-self-argument, too-few-pulic-methods
