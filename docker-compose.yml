@@ -14,10 +14,12 @@ services:
     networks:
       - uni-schem-balancer
 
-  mysql:
+  database:
     image: mysql:8.0
-    container_name: mysql
+    container_name: database
     restart: unless-stopped
+    # ports:
+    #   - 3306:3306
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_DATABASE=${MYSQL_DB}
@@ -25,7 +27,7 @@ services:
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - DB_HOST=${MYSQL_HOST}
     volumes:
-      - mysql_data:/var/lib/mysql
+      - ./mysql_data:/var/lib/mysql
     networks:
       - uni-schem-balancer
     labels:
@@ -68,9 +70,9 @@ services:
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - MYSQL_HOST=${MYSQL_HOST}
       - MYSQL_DB=${MYSQL_DB}
-      - DATABASE_URL=mysql+pymysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST}/${MYSQL_DB}
+      - DATABASE_URL=mysql+pymysql://${MYSQL_USER}:${MYSQL_PASSWORD}@{MYSQL_HOST}:3306/${MYSQL_DB}
     depends_on:
-      - mysql
+      - database
     labels:
         - "traefik.enable=true"
         - "traefik.http.routers.api.rule=PathPrefix(`/api`)"
