@@ -21,12 +21,13 @@ class Course(Base):
     """
     __tablename__ = "course"
 
-    course_id    = Column(Integer, primary_key=True, index=True)
-    name         = Column(String(100), nullable=False)
-    code         = Column(String(20), nullable=False)
-    semester     = Column(String(20), nullable=False)
-    professor_id = Column(Integer, ForeignKey("professor.professor_id"), nullable=False)
+    course_id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(100), nullable=False)
+    code = Column(String(20), nullable=False)
+    semester = Column(String(20), nullable=False)
+    professor_id = Column(Integer, ForeignKey(
+        "professor.professor_id"), nullable=False)
 
-    professor   = relationship("Professor",       back_populates="courses")
-    schedules   = relationship("Schedule",        back_populates="course")
+    professor = relationship("Professor",       back_populates="courses")
+    schedules = relationship("Schedule",        back_populates="course")
     enrollments = relationship("StudentCourse",   back_populates="course")

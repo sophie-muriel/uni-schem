@@ -4,6 +4,7 @@ from app.models.student_course import StudentCourse
 from app.schemas.student_course import StudentCourseCreate, StudentCourseUpdate
 from app.repositories import student_course_repository
 
+
 def register_student_course(db: Session, data: StudentCourseCreate) -> StudentCourse:
     """
     Registers a new student-course enrollment.
@@ -21,17 +22,20 @@ def register_student_course(db: Session, data: StudentCourseCreate) -> StudentCo
     )
     return student_course_repository.create_student_course(db, new_relation)
 
+
 def get_student_course(db: Session, relation_id: int) -> Optional[StudentCourse]:
     """
     Retrieves an enrollment by ID.
     """
     return student_course_repository.get_student_course_by_id(db, relation_id)
 
+
 def list_student_courses(db: Session) -> List[StudentCourse]:
     """
     Retrieves all student-course enrollments.
     """
     return student_course_repository.get_all_student_courses(db)
+
 
 def modify_student_course(
     db: Session, relation_id: int, updates: StudentCourseUpdate
@@ -42,6 +46,7 @@ def modify_student_course(
     return student_course_repository.update_student_course(
         db, relation_id, updates.dict(exclude_unset=True)
     )
+
 
 def remove_student_course(db: Session, relation_id: int) -> bool:
     """

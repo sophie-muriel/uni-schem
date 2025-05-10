@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 from app.db.database import Base
 
+
 class Student(Base):
     """
     Represents a student in the academic system.
@@ -18,9 +19,9 @@ class Student(Base):
     __tablename__ = "student"
 
     student_id = Column(Integer, primary_key=True, index=True)
-    name       = Column(String(100), nullable=False)
-    email      = Column(String(320), unique=True, nullable=False)
-    phone      = Column(String(15), nullable=True)
+    name = Column(String(100), nullable=False)
+    email = Column(String(320), unique=True, nullable=False)
+    phone = Column(String(15), nullable=True)
 
     # Relationship back to StudentCourse (enrollments)
     enrollments = relationship("StudentCourse", back_populates="student")

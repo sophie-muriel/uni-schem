@@ -1,6 +1,7 @@
 from typing import Optional
 from pydantic import BaseModel, EmailStr, constr
 
+
 class StudentBase(BaseModel):
     """
     Shared attributes for student models.

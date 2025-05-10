@@ -1,8 +1,11 @@
 # db/session.py
-from db.database import SessionLocal
+from .database import SessionLocal
 
 
 def get_db():
+    """
+    Provides a SQLAlchemy session to the endpoints.
+    """
     db = SessionLocal()
     try:
         yield db

@@ -7,20 +7,9 @@ from app.schemas.student_course import (
     StudentCourseOut,
 )
 from app.services import student_course_service
-from app.db.database import SessionLocal
+from app.db.session import get_db
 
 router = APIRouter()
-
-
-def get_db():
-    """
-    Provides a SQLAlchemy database session to endpoints.
-    """
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 @router.post("/", response_model=StudentCourseOut)

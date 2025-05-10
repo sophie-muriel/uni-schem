@@ -4,6 +4,7 @@ from app.models.course import Course
 from app.schemas.course import CourseCreate, CourseUpdate
 from app.repositories import course_repository
 
+
 def register_course(db: Session, data: CourseCreate) -> Course:
     """
     Registers a new course.

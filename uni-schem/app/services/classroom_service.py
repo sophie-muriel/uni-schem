@@ -4,6 +4,7 @@ from app.models.classroom import Classroom
 from app.schemas.classroom import ClassroomCreate, ClassroomUpdate
 from app.repositories import classroom_repository
 
+
 def register_classroom(db: Session, data: ClassroomCreate) -> Classroom:
     """
     Registers a new classroom.
@@ -23,17 +24,20 @@ def register_classroom(db: Session, data: ClassroomCreate) -> Classroom:
     )
     return classroom_repository.create_classroom(db, new_classroom)
 
+
 def get_classroom(db: Session, classroom_id: int) -> Optional[Classroom]:
     """
     Retrieves a classroom by ID.
     """
     return classroom_repository.get_classroom_by_id(db, classroom_id)
 
+
 def list_classrooms(db: Session) -> List[Classroom]:
     """
     Retrieves all classrooms.
     """
     return classroom_repository.get_all_classrooms(db)
+
 
 def modify_classroom(
     db: Session, classroom_id: int, updates: ClassroomUpdate
@@ -44,6 +48,7 @@ def modify_classroom(
     return classroom_repository.update_classroom(
         db, classroom_id, updates.dict(exclude_unset=True)
     )
+
 
 def remove_classroom(db: Session, classroom_id: int) -> bool:
     """

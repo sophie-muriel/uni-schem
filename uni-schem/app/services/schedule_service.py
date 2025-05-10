@@ -5,6 +5,7 @@ from app.models.schedule import Schedule
 from app.schemas.schedule import ScheduleCreate, ScheduleUpdate
 from app.repositories import schedule_repository
 
+
 def register_schedule(db: Session, data: ScheduleCreate) -> Schedule:
     """
     Registers a new schedule in the system.
@@ -25,17 +26,20 @@ def register_schedule(db: Session, data: ScheduleCreate) -> Schedule:
     )
     return schedule_repository.create_schedule(db, new_schedule)
 
+
 def get_schedule(db: Session, schedule_id: int) -> Optional[Schedule]:
     """
     Retrieves a schedule by its ID.
     """
     return schedule_repository.get_schedule_by_id(db, schedule_id)
 
+
 def list_schedules(db: Session) -> List[Schedule]:
     """
     Retrieves all schedules from the database.
     """
     return schedule_repository.get_all_schedules(db)
+
 
 def modify_schedule(
     db: Session, schedule_id: int, updates: ScheduleUpdate
@@ -46,6 +50,7 @@ def modify_schedule(
     return schedule_repository.update_schedule(
         db, schedule_id, updates.dict(exclude_unset=True)
     )
+
 
 def remove_schedule(db: Session, schedule_id: int) -> bool:
     """

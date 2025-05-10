@@ -19,10 +19,11 @@ class Availability(Base):
     __tablename__ = "availability"
 
     availability_id = Column(Integer, primary_key=True, index=True)
-    professor_id    = Column(Integer, ForeignKey("professor.professor_id"), nullable=False)
-    day             = Column(SQLEnum(Day), nullable=False)
-    start_time      = Column(Time, nullable=False)
-    end_time        = Column(Time, nullable=False)
+    professor_id = Column(Integer, ForeignKey(
+        "professor.professor_id"), nullable=False)
+    day = Column(SQLEnum(Day), nullable=False)
+    start_time = Column(Time, nullable=False)
+    end_time = Column(Time, nullable=False)
 
     # Relationship back to Professor
     professor = relationship("Professor", back_populates="availabilities")

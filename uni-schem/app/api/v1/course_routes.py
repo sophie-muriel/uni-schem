@@ -4,20 +4,9 @@ from sqlalchemy.orm import Session
 
 from app.schemas.course import CourseCreate, CourseUpdate, CourseOut
 from app.services import course_service
-from app.db.database import SessionLocal
+from app.db.session import get_db
 
 router = APIRouter()
-
-
-def get_db():
-    """
-    Dependency that provides a SQLAlchemy session.
-    """
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 @router.post("/", response_model=CourseOut)

@@ -4,6 +4,7 @@ from app.models.availability import Availability
 from app.schemas.availability import AvailabilityCreate, AvailabilityUpdate
 from app.repositories import availability_repository
 
+
 def register_availability(db: Session, data: AvailabilityCreate) -> Availability:
     """
     Registers a new availability entry for a professor.

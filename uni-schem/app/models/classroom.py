@@ -19,9 +19,9 @@ class Classroom(Base):
     __tablename__ = "classroom"
 
     classroom_id = Column(Integer, primary_key=True, index=True)
-    name         = Column(String(50), nullable=False)
-    capacity     = Column(Integer, nullable=False)
-    location     = Column(String(100), nullable=True)
+    name = Column(String(50), nullable=False)
+    capacity = Column(Integer, nullable=False)
+    location = Column(String(100), nullable=True)
 
     # Relationship back to Schedule
     schedules = relationship("Schedule", back_populates="classroom")

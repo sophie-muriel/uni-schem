@@ -7,20 +7,9 @@ from app.schemas.availability import (
     AvailabilityOut,
 )
 from app.services import availability_service
-from app.db.database import SessionLocal
+from app.db.session import get_db
 
 router = APIRouter()
-
-
-def get_db():
-    """
-    Provides a SQLAlchemy session to the endpoints.
-    """
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 @router.post("/", response_model=AvailabilityOut)

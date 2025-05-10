@@ -3,20 +3,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.schemas.classroom import ClassroomCreate, ClassroomUpdate, ClassroomOut
 from app.services import classroom_service
-from app.db.database import SessionLocal
+from app.db.session import get_db
 
 router = APIRouter()
-
-
-def get_db():
-    """
-    Provides a SQLAlchemy database session to endpoints.
-    """
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 @router.post("/", response_model=ClassroomOut)

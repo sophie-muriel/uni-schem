@@ -2,6 +2,7 @@ from typing import Optional
 import re
 from pydantic import BaseModel, EmailStr, constr, field_validator
 
+
 class ProfessorBase(BaseModel):
     """
     Shared attributes for professor models.
@@ -30,7 +31,8 @@ class ProfessorBase(BaseModel):
         Ensure the name only contains letters, spaces, and apostrophes.
         """
         if not re.match(r"^[A-Za-z\s']+$", v):
-            raise ValueError("Name must only contain letters, spaces, or apostrophes")
+            raise ValueError(
+                "Name must only contain letters, spaces, or apostrophes")
         return v
 
 
@@ -66,7 +68,8 @@ class ProfessorUpdate(BaseModel):
     @field_validator("name")
     def validate_name(cls, v):
         if v and not re.match(r"^[A-Za-z\s']+$", v):
-            raise ValueError("Name must only contain letters, spaces, or apostrophes")
+            raise ValueError(
+                "Name must only contain letters, spaces, or apostrophes")
         return v
 
 

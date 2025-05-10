@@ -3,21 +3,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.schemas.student import StudentCreate, StudentUpdate, StudentOut
 from app.services import student_service
-from app.db.database import SessionLocal
+from app.db.session import get_db
 
 router = APIRouter()
-
-
-def get_db():
-    """
-    Dependency that provides a SQLAlchemy database session.
-    Closes the session automatically after the request.
-    """
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 @router.post("/", response_model=StudentOut)
