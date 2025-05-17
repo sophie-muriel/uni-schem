@@ -13,7 +13,18 @@ router = APIRouter()
 @router.post("/", response_model=ScheduleOut)
 def create_schedule_route(schedule: ScheduleCreate, db: Session = Depends(get_db)):
     """
-    Create a new schedule entry.
+    Creates a new schedule entry.
+
+    Args:
+        schedule (ScheduleCreate): The schedule data to be registered.
+        db (Session): SQLAlchemy session, injected by FastAPI.
+
+    Returns:
+        ScheduleOut: The newly created schedule record.
+
+    Raises:
+        HTTPException: If a ValueError occurs during registration, returns a 400 Bad Request
+        with the error message.
     """
     try:
         return schedule_service.register_schedule(db, schedule)
@@ -24,7 +35,13 @@ def create_schedule_route(schedule: ScheduleCreate, db: Session = Depends(get_db
 @router.get("/", response_model=List[ScheduleOut])
 def list_schedules_route(db: Session = Depends(get_db)):
     """
-    Retrieve all schedules.
+    Retrieves all schedule entries.
+
+    Args:
+        db (Session): SQLAlchemy session, injected by FastAPI.
+
+    Returns:
+        List[ScheduleOut]: A list of all schedules.
     """
     return schedule_service.list_schedules(db)
 
@@ -32,7 +49,17 @@ def list_schedules_route(db: Session = Depends(get_db)):
 @router.get("/{schedule_id}", response_model=ScheduleOut)
 def get_schedule_route(schedule_id: int, db: Session = Depends(get_db)):
     """
-    Retrieve a schedule by its ID.
+    Retrieves a schedule entry by its unique ID.
+
+    Args:
+        schedule_id (int): The unique identifier of the schedule.
+        db (Session): SQLAlchemy session, injected by FastAPI.
+
+    Returns:
+        ScheduleOut: The requested schedule record.
+
+    Raises:
+        HTTPException: If the schedule is not found, returns a 404 Not Found error.
     """
     schedule = schedule_service.get_schedule(db, schedule_id)
     if not schedule:
@@ -45,7 +72,18 @@ def update_schedule_route(
     schedule_id: int, updates: ScheduleUpdate, db: Session = Depends(get_db)
 ):
     """
-    Update an existing schedule entry.
+    Updates an existing schedule entry by its ID.
+
+    Args:
+        schedule_id (int): The unique identifier of the schedule to update.
+        updates (ScheduleUpdate): The new values to apply to the schedule.
+        db (Session): SQLAlchemy session, injected by FastAPI.
+
+    Returns:
+        ScheduleOut: The updated schedule record.
+
+    Raises:
+        HTTPException: If the schedule is not found, returns a 404 Not Found error.
     """
     updated = schedule_service.modify_schedule(db, schedule_id, updates)
     if not updated:
@@ -56,7 +94,17 @@ def update_schedule_route(
 @router.delete("/{schedule_id}")
 def delete_schedule_route(schedule_id: int, db: Session = Depends(get_db)):
     """
-    Delete a schedule by ID.
+    Deletes a schedule entry by its ID.
+
+    Args:
+        schedule_id (int): The unique identifier of the schedule to delete.
+        db (Session): SQLAlchemy session, injected by FastAPI.
+
+    Returns:
+        dict: A message indicating successful deletion.
+
+    Raises:
+        HTTPException: If the schedule is not found, returns a 404 Not Found error.
     """
     if not schedule_service.remove_schedule(db, schedule_id):
         raise HTTPException(status_code=404, detail="Schedule not found")

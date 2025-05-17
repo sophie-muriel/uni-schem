@@ -17,7 +17,17 @@ def create_student_course_route(
     data: StudentCourseCreate, db: Session = Depends(get_db)
 ):
     """
-    Create a new student-course enrollment.
+    Creates a new enrollment record linking a student to a course.
+
+    Args:
+        data (StudentCourseCreate): The enrollment details to register.
+        db (Session): SQLAlchemy session, injected by FastAPI.
+
+    Returns:
+        StudentCourseOut: The newly created student-course enrollment record.
+
+    Raises:
+        HTTPException: If validation fails, returns 400 Bad Request with the error message.
     """
     try:
         return student_course_service.register_student_course(db, data)
@@ -28,7 +38,13 @@ def create_student_course_route(
 @router.get("/", response_model=List[StudentCourseOut])
 def list_student_courses_route(db: Session = Depends(get_db)):
     """
-    Retrieve all student-course enrollments.
+    Retrieves all student-course enrollment records from the database.
+
+    Args:
+        db (Session): SQLAlchemy session, injected by FastAPI.
+
+    Returns:
+        List[StudentCourseOut]: A list of all registered student-course enrollments.
     """
     return student_course_service.list_student_courses(db)
 
@@ -36,7 +52,17 @@ def list_student_courses_route(db: Session = Depends(get_db)):
 @router.get("/{relation_id}", response_model=StudentCourseOut)
 def get_student_course_route(relation_id: int, db: Session = Depends(get_db)):
     """
-    Retrieve a student-course enrollment by ID.
+    Retrieves a single student-course enrollment record by its ID.
+
+    Args:
+        relation_id (int): The unique identifier of the student-course enrollment.
+        db (Session): SQLAlchemy session, injected by FastAPI.
+
+    Returns:
+        StudentCourseOut: The requested enrollment record.
+
+    Raises:
+        HTTPException: If the enrollment is not found, returns a 404 Not Found error.
     """
     relation = student_course_service.get_student_course(db, relation_id)
     if not relation:
@@ -49,7 +75,18 @@ def update_student_course_route(
     relation_id: int, updates: StudentCourseUpdate, db: Session = Depends(get_db)
 ):
     """
-    Update an existing student-course enrollment.
+    Updates an existing student-course enrollment by its ID.
+
+    Args:
+        relation_id (int): The unique identifier of the enrollment to update.
+        updates (StudentCourseUpdate): The data containing fields to update.
+        db (Session): SQLAlchemy session, injected by FastAPI.
+
+    Returns:
+        StudentCourseOut: The updated enrollment record.
+
+    Raises:
+        HTTPException: If the enrollment is not found, returns a 404 Not Found error.
     """
     updated = student_course_service.modify_student_course(
         db, relation_id, updates)
@@ -61,7 +98,17 @@ def update_student_course_route(
 @router.delete("/{relation_id}")
 def delete_student_course_route(relation_id: int, db: Session = Depends(get_db)):
     """
-    Delete a student-course enrollment by ID.
+    Deletes a student-course enrollment by its ID.
+
+    Args:
+        relation_id (int): The unique identifier of the enrollment to delete.
+        db (Session): SQLAlchemy session, injected by FastAPI.
+
+    Returns:
+        dict: A message confirming successful deletion.
+
+    Raises:
+        HTTPException: If the enrollment is not found, returns a 404 Not Found error.
     """
     if not student_course_service.remove_student_course(db, relation_id):
         raise HTTPException(status_code=404, detail="Enrollment not found")

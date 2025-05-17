@@ -11,14 +11,17 @@ router = APIRouter()
 @router.post("/", response_model=StudentOut)
 def create_student_route(student: StudentCreate, db: Session = Depends(get_db)):
     """
-    Create a new student record.
+    Creates a new student record.
 
     Args:
-        student (StudentCreate): The student data to be created.
-        db (Session): Database session (injected).
+        student (StudentCreate): The data for the student to be created.
+        db (Session): SQLAlchemy session, injected by FastAPI.
 
     Returns:
-        StudentOut: The created student.
+        StudentOut: The newly created student record.
+
+    Raises:
+        HTTPException: If the input data is invalid, returns a 400 Bad Request error.
     """
     try:
         return student_service.register_student(db, student)
@@ -29,13 +32,13 @@ def create_student_route(student: StudentCreate, db: Session = Depends(get_db)):
 @router.get("/", response_model=List[StudentOut])
 def list_students_route(db: Session = Depends(get_db)):
     """
-    Retrieve all students from the database.
+    Retrieves all student records.
 
     Args:
-        db (Session): Database session (injected).
+        db (Session): The database session dependency.
 
     Returns:
-        List[StudentOut]: A list of all students.
+        List[StudentOut]: A list of all registered students.
     """
     return student_service.list_students(db)
 
@@ -43,17 +46,17 @@ def list_students_route(db: Session = Depends(get_db)):
 @router.get("/{student_id}", response_model=StudentOut)
 def get_student_route(student_id: int, db: Session = Depends(get_db)):
     """
-    Retrieve a single student by their ID.
+    Retrieves a student record by ID.
 
     Args:
-        student_id (int): The student's unique identifier.
-        db (Session): Database session (injected).
+        student_id (int): Unique identifier of the student.
+        db (Session): Database session dependency (injected).
 
     Returns:
-        StudentOut: The matching student if found.
+        StudentOut: The student data if found.
 
     Raises:
-        HTTPException: If student is not found.
+        HTTPException: If no student exists with the given ID, returns a 404 Not Found error.
     """
     student = student_service.get_student(db, student_id)
     if not student:
@@ -66,18 +69,18 @@ def update_student_route(
     student_id: int, updates: StudentUpdate, db: Session = Depends(get_db)
 ):
     """
-    Update an existing student's information.
+    Updates an existing student record.
 
     Args:
-        student_id (int): The ID of the student to update.
-        updates (StudentUpdate): The data to update.
-        db (Session): Database session (injected).
+        student_id (int): The unique ID of the student to update.
+        updates (StudentUpdate): The updated student data.
+        db (Session): The database session dependency.
 
     Returns:
-        StudentOut: The updated student.
+        StudentOut: The updated student data.
 
     Raises:
-        HTTPException: If student is not found.
+        HTTPException: If the student is not found, returns a 404 Not Found error.
     """
     updated_student = student_service.modify_student(db, student_id, updates)
     if not updated_student:
@@ -98,7 +101,7 @@ def delete_student_route(student_id: int, db: Session = Depends(get_db)):
         dict: Deletion confirmation message.
 
     Raises:
-        HTTPException: If student is not found.
+        HTTPException: If the student is not found, returns a 404 Not Found error.
     """
     if not student_service.remove_student(db, student_id):
         raise HTTPException(status_code=404, detail="Student not found")

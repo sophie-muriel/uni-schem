@@ -12,7 +12,18 @@ router = APIRouter()
 @router.post("/", response_model=CourseOut)
 def create_course_route(course: CourseCreate, db: Session = Depends(get_db)):
     """
-    Create a new course.
+    Creates a new course entry.
+
+    Args:
+        course (CourseCreate): The course information to be registered.
+        db (Session): SQLAlchemy session, injected by FastAPI.
+
+    Returns:
+        CourseOut: The newly created course record.
+
+    Raises:
+        HTTPException: If a ValueError occurs during registration, returns a 400 Bad Request
+        with the corresponding error message.
     """
     try:
         return course_service.register_course(db, course)
@@ -23,7 +34,13 @@ def create_course_route(course: CourseCreate, db: Session = Depends(get_db)):
 @router.get("/", response_model=List[CourseOut])
 def list_courses_route(db: Session = Depends(get_db)):
     """
-    Retrieve all courses.
+    Retrieves all course entries from the database.
+
+    Args:
+        db (Session): SQLAlchemy session, injected by FastAPI.
+
+    Returns:
+        List[CourseOut]: A list of all registered courses.
     """
     return course_service.list_courses(db)
 
@@ -31,7 +48,17 @@ def list_courses_route(db: Session = Depends(get_db)):
 @router.get("/{course_id}", response_model=CourseOut)
 def get_course_route(course_id: int, db: Session = Depends(get_db)):
     """
-    Retrieve a course by its ID.
+    Retrieves a course entry by its unique ID.
+
+    Args:
+        course_id (int): The unique identifier of the course.
+        db (Session): SQLAlchemy session, injected by FastAPI.
+
+    Returns:
+        CourseOut: The requested course record.
+
+    Raises:
+        HTTPException: If the course is not found, returns a 404 Not Found error.
     """
     course = course_service.get_course(db, course_id)
     if not course:
@@ -44,7 +71,18 @@ def update_course_route(
     course_id: int, updates: CourseUpdate, db: Session = Depends(get_db)
 ):
     """
-    Update an existing course.
+    Updates an existing course entry by its ID.
+
+    Args:
+        course_id (int): The unique identifier of the course to update.
+        updates (CourseUpdate): The data containing the fields to be updated.
+        db (Session): SQLAlchemy session, injected by FastAPI.
+
+    Returns:
+        CourseOut: The updated course record.
+
+    Raises:
+        HTTPException: If the course is not found, returns a 404 Not Found error.
     """
     updated = course_service.modify_course(db, course_id, updates)
     if not updated:
@@ -55,7 +93,17 @@ def update_course_route(
 @router.delete("/{course_id}")
 def delete_course_route(course_id: int, db: Session = Depends(get_db)):
     """
-    Delete a course by its ID.
+    Deletes a course entry by its ID.
+
+    Args:
+        course_id (int): The unique identifier of the course to delete.
+        db (Session): SQLAlchemy session, injected by FastAPI.
+
+    Returns:
+        dict: A confirmation message indicating successful deletion.
+
+    Raises:
+        HTTPException: If the course is not found, returns a 404 Not Found error.
     """
     if not course_service.remove_course(db, course_id):
         raise HTTPException(status_code=404, detail="Course not found")

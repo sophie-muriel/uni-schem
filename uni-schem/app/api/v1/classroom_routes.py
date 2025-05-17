@@ -11,7 +11,18 @@ router = APIRouter()
 @router.post("/", response_model=ClassroomOut)
 def create_classroom_route(data: ClassroomCreate, db: Session = Depends(get_db)):
     """
-    Create a new classroom entry.
+    Creates a new classroom entry.
+
+    Args:
+        data (ClassroomCreate): The classroom information to be registered.
+        db (Session): SQLAlchemy session, injected by FastAPI.
+
+    Returns:
+        ClassroomOut: The newly created classroom record.
+
+    Raises:
+        HTTPException: If a ValueError occurs during registration, returns a 400 Bad Request
+        with the corresponding error message.
     """
     try:
         return classroom_service.register_classroom(db, data)
@@ -22,7 +33,13 @@ def create_classroom_route(data: ClassroomCreate, db: Session = Depends(get_db))
 @router.get("/", response_model=List[ClassroomOut])
 def list_classrooms_route(db: Session = Depends(get_db)):
     """
-    Retrieve all classrooms.
+    Retrieves all classroom entries from the database.
+
+    Args:
+        db (Session): SQLAlchemy session, injected by FastAPI.
+
+    Returns:
+        List[ClassroomOut]: A list of all registered classrooms.
     """
     return classroom_service.list_classrooms(db)
 
@@ -30,7 +47,17 @@ def list_classrooms_route(db: Session = Depends(get_db)):
 @router.get("/{classroom_id}", response_model=ClassroomOut)
 def get_classroom_route(classroom_id: int, db: Session = Depends(get_db)):
     """
-    Retrieve a classroom by its ID.
+    Retrieves a classroom entry by its unique ID.
+
+    Args:
+        classroom_id (int): The unique identifier of the classroom.
+        db (Session): SQLAlchemy session, injected by FastAPI.
+
+    Returns:
+        ClassroomOut: The requested classroom record.
+
+    Raises:
+        HTTPException: If the classroom is not found, returns a 404 Not Found error.
     """
     classroom = classroom_service.get_classroom(db, classroom_id)
     if not classroom:
@@ -43,7 +70,18 @@ def update_classroom_route(
     classroom_id: int, updates: ClassroomUpdate, db: Session = Depends(get_db)
 ):
     """
-    Update an existing classroom.
+    Updates an existing classroom entry by its ID.
+
+    Args:
+        classroom_id (int): The unique identifier of the classroom to update.
+        updates (ClassroomUpdate): The data containing the fields to be updated.
+        db (Session): SQLAlchemy session, injected by FastAPI.
+
+    Returns:
+        ClassroomOut: The updated classroom record.
+
+    Raises:
+        HTTPException: If the classroom is not found, returns a 404 Not Found error.
     """
     updated = classroom_service.modify_classroom(db, classroom_id, updates)
     if not updated:
@@ -54,7 +92,17 @@ def update_classroom_route(
 @router.delete("/{classroom_id}")
 def delete_classroom_route(classroom_id: int, db: Session = Depends(get_db)):
     """
-    Delete a classroom by its ID.
+    Deletes a classroom entry by its ID.
+
+    Args:
+        classroom_id (int): The unique identifier of the classroom to delete.
+        db (Session): SQLAlchemy session, injected by FastAPI.
+
+    Returns:
+        dict: A confirmation message indicating successful deletion.
+
+    Raises:
+        HTTPException: If the classroom is not found, returns a 404 Not Found error.
     """
     if not classroom_service.remove_classroom(db, classroom_id):
         raise HTTPException(status_code=404, detail="Classroom not found")

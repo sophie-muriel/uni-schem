@@ -15,7 +15,17 @@ router = APIRouter()
 @router.post("/", response_model=AvailabilityOut)
 def create_availability_route(data: AvailabilityCreate, db: Session = Depends(get_db)):
     """
-    Create a new professor availability entry.
+    Creates a new availability entry for a professor.
+
+    Args:
+        data (AvailabilityCreate): The availability information to be registered.
+        db (Session): SQLAlchemy session, injected by FastAPI.
+
+    Returns:
+        AvailabilityOut: The newly created availability record.
+
+    Raises:
+        HTTPException: If validation fails, raises 400 Bad Request with the error message.
     """
     try:
         return availability_service.register_availability(db, data)
@@ -26,7 +36,13 @@ def create_availability_route(data: AvailabilityCreate, db: Session = Depends(ge
 @router.get("/", response_model=List[AvailabilityOut])
 def list_availabilities_route(db: Session = Depends(get_db)):
     """
-    Retrieve all professor availability entries.
+    Retrieves all professor availability entries from the database.
+
+    Args:
+        db (Session): SQLAlchemy session, injected by FastAPI.
+
+    Returns:
+        List[AvailabilityOut]: A list of all registered availability records.
     """
     return availability_service.list_availabilities(db)
 
@@ -34,7 +50,17 @@ def list_availabilities_route(db: Session = Depends(get_db)):
 @router.get("/{availability_id}", response_model=AvailabilityOut)
 def get_availability_route(availability_id: int, db: Session = Depends(get_db)):
     """
-    Retrieve a single availability entry by ID.
+    Retrieves a single availability entry by its ID.
+
+    Args:
+        availability_id (int): The unique identifier of the availability entry.
+        db (Session): SQLAlchemy session, injected by FastAPI.
+
+    Returns:
+        AvailabilityOut: The requested availability record.
+
+    Raises:
+        HTTPException: If the availability entry is not found, returns a 404 Not Found error.
     """
     availability = availability_service.get_availability(db, availability_id)
     if not availability:
@@ -47,7 +73,18 @@ def update_availability_route(
     availability_id: int, updates: AvailabilityUpdate, db: Session = Depends(get_db)
 ):
     """
-    Update a professor's availability.
+    Updates a professor's availability entry by its ID.
+
+    Args:
+        availability_id (int): The unique identifier of the availability entry to update.
+        updates (AvailabilityUpdate): The data containing the fields to be updated.
+        db (Session): SQLAlchemy session, injected by FastAPI.
+
+    Returns:
+        AvailabilityOut: The updated availability record.
+
+    Raises:
+        HTTPException: If the availability entry is not found, returns a 404 Not Found error.
     """
     updated = availability_service.modify_availability(
         db, availability_id, updates)
@@ -59,7 +96,17 @@ def update_availability_route(
 @router.delete("/{availability_id}")
 def delete_availability_route(availability_id: int, db: Session = Depends(get_db)):
     """
-    Delete a professor's availability entry by ID.
+    Deletes a professor's availability entry by its ID.
+
+    Args:
+        availability_id (int): The unique identifier of the availability entry to delete.
+        db (Session): SQLAlchemy session, injected by FastAPI.
+
+    Returns:
+        dict: A message confirming successful deletion.
+
+    Raises:
+        HTTPException: If the availability entry is not found, returns a 404 Not Found error.
     """
     if not availability_service.remove_availability(db, availability_id):
         raise HTTPException(status_code=404, detail="Availability not found")

@@ -12,7 +12,18 @@ router = APIRouter()
 @router.post("/", response_model=ProfessorOut)
 def create_professor_route(professor: ProfessorCreate, db: Session = Depends(get_db)):
     """
-    Create a new professor.
+    Creates a new professor entry.
+
+    Args:
+        professor (ProfessorCreate): The professor data to be registered.
+        db (Session): SQLAlchemy session, injected by FastAPI.
+
+    Returns:
+        ProfessorOut: The newly created professor record.
+
+    Raises:
+        HTTPException: If a ValueError occurs during registration, returns a 400 Bad Request
+        with the error message.
     """
     try:
         return professor_service.register_professor(db, professor)
@@ -23,7 +34,13 @@ def create_professor_route(professor: ProfessorCreate, db: Session = Depends(get
 @router.get("/", response_model=List[ProfessorOut])
 def list_professors_route(db: Session = Depends(get_db)):
     """
-    Retrieve all professors.
+    Retrieves all professors.
+
+    Args:
+        db (Session): SQLAlchemy session, injected by FastAPI.
+
+    Returns:
+        List[ProfessorOut]: A list of all registered professors.
     """
     return professor_service.list_professors(db)
 
@@ -31,7 +48,17 @@ def list_professors_route(db: Session = Depends(get_db)):
 @router.get("/{professor_id}", response_model=ProfessorOut)
 def get_professor_route(professor_id: int, db: Session = Depends(get_db)):
     """
-    Retrieve a professor by their ID.
+    Retrieves a professor entry by their unique ID.
+
+    Args:
+        professor_id (int): The unique identifier of the professor.
+        db (Session): SQLAlchemy session, injected by FastAPI.
+
+    Returns:
+        ProfessorOut: The requested professor record.
+
+    Raises:
+        HTTPException: If the professor is not found, returns a 404 Not Found error.
     """
     professor = professor_service.get_professor(db, professor_id)
     if not professor:
@@ -44,7 +71,18 @@ def update_professor_route(
     professor_id: int, updates: ProfessorUpdate, db: Session = Depends(get_db)
 ):
     """
-    Update a professor's information.
+    Updates an existing professor's information by their ID.
+
+    Args:
+        professor_id (int): The unique identifier of the professor to update.
+        updates (ProfessorUpdate): The data containing updated fields.
+        db (Session): SQLAlchemy session, injected by FastAPI.
+
+    Returns:
+        ProfessorOut: The updated professor record.
+
+    Raises:
+        HTTPException: If the professor is not found, returns a 404 Not Found error.
     """
     updated = professor_service.modify_professor(db, professor_id, updates)
     if not updated:
@@ -55,7 +93,17 @@ def update_professor_route(
 @router.delete("/{professor_id}")
 def delete_professor_route(professor_id: int, db: Session = Depends(get_db)):
     """
-    Delete a professor by ID.
+    Deletes a professor entry by their ID.
+
+    Args:
+        professor_id (int): The unique identifier of the professor to delete.
+        db (Session): SQLAlchemy session, injected by FastAPI.
+
+    Returns:
+        dict: A confirmation message indicating successful deletion.
+
+    Raises:
+        HTTPException: If the professor is not found, returns a 404 Not Found error.
     """
     if not professor_service.remove_professor(db, professor_id):
         raise HTTPException(status_code=404, detail="Professor not found")
