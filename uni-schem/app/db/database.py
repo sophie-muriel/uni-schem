@@ -28,8 +28,13 @@ Base.metadata.create_all(bind=engine)
 
 def get_db():
     """
-    Dependency para FastAPI: crea una sesión,
-    la cierra al terminar la petición y la inyecta en tus routers.
+    Dependency for FastAPI that provides a database session.
+
+    This function creates a new SQLAlchemy session for each request,
+    yields it to the path operation, and ensures it is closed once the request is finished.
+
+    Yields:
+        Session: A SQLAlchemy database session.
     """
     db = SessionLocal()
     try:
