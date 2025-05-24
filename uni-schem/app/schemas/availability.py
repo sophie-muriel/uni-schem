@@ -8,7 +8,7 @@ class AvailabilityBase(BaseModel):
     Shared attributes for professor availability.
 
     Attributes:
-        professor_id (int): The ID of the professor.
+        professor_id (int): The id of the professor.
         day (Day): Day of the week.
         start_time (time): Start time of the availability slot.
         end_time (time): End time of the availability slot.
