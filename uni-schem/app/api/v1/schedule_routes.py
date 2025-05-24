@@ -1,4 +1,3 @@
-
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -67,10 +66,50 @@ def get_schedule_route(schedule_id: int, db: Session = Depends(get_db)):
     return schedule
 
 
+@router.get("/course/{course_id}", response_model=List[ScheduleOut])
+def get_schedules_by_course_id_route(course_id: int, db: Session = Depends(get_db)):
+    """
+    Retrieves all schedules for a specific course by its ID.
+
+    Args:
+        course_id (int): The unique identifier of the course.
+        db (Session): SQLAlchemy session, injected by FastAPI.
+
+    Returns:
+        List[ScheduleOut]: A list of schedules for the specified course.
+
+    Raises:
+        HTTPException: If no schedules are found, returns a 404 Not Found error.
+    """
+    schedules = schedule_service.get_schedules_by_course_id(db, course_id)
+    if not schedules:
+        raise HTTPException(status_code=404, detail="No schedules found for this course")
+    return schedules
+
+
+@router.get("/classroom/{classroom_id}", response_model=List[ScheduleOut])
+def get_schedules_by_classroom_id_route(classroom_id: int, db: Session = Depends(get_db)):
+    """
+    Retrieves all schedules for a specific classroom by its ID.
+
+    Args:
+        classroom_id (int): The unique identifier of the classroom.
+        db (Session): SQLAlchemy session, injected by FastAPI.
+
+    Returns:
+        List[ScheduleOut]: A list of schedules for the specified classroom.
+
+    Raises:
+        HTTPException: If no schedules are found, returns a 404 Not Found error.
+    """
+    schedules = schedule_service.get_schedules_by_classroom_id(db, classroom_id)
+    if not schedules:
+        raise HTTPException(status_code=404, detail="No schedules found for this classroom")
+    return schedules
+
+
 @router.put("/{schedule_id}", response_model=ScheduleOut)
-def update_schedule_route(
-    schedule_id: int, updates: ScheduleUpdate, db: Session = Depends(get_db)
-):
+def update_schedule_route(schedule_id: int, updates: ScheduleUpdate, db: Session = Depends(get_db)):
     """
     Updates an existing schedule entry by its ID.
 
