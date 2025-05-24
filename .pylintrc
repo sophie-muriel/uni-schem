@@ -1,2 +1,2 @@
 [MASTER]
-disable = no-self-argument, too-few-pulic-methods
+disable = no-self-argument, too-few-public-methods

@@ -7,6 +7,7 @@ from app.db.session import get_db
 
 router = APIRouter()
 
+
 @router.post("/", response_model=StudentOut)
 def create_student_route(student: StudentCreate, db: Session = Depends(get_db)):
     """
@@ -27,6 +28,7 @@ def create_student_route(student: StudentCreate, db: Session = Depends(get_db)):
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
 
+
 @router.get("/", response_model=List[StudentOut])
 def list_students_route(db: Session = Depends(get_db)):
     """
@@ -39,6 +41,7 @@ def list_students_route(db: Session = Depends(get_db)):
         List[StudentOut]: A list of all registered students.
     """
     return student_service.list_students(db)
+
 
 @router.get("/{student_id}", response_model=StudentOut)
 def get_student_route(student_id: int, db: Session = Depends(get_db)):
@@ -60,6 +63,7 @@ def get_student_route(student_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Student not found")
     return student
 
+
 @router.get("/dni/{dni}", response_model=StudentOut)
 def get_student_by_dni_route(dni: str, db: Session = Depends(get_db)):
     """
@@ -79,6 +83,7 @@ def get_student_by_dni_route(dni: str, db: Session = Depends(get_db)):
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
     return student
+
 
 @router.put("/{student_id}", response_model=StudentOut)
 def update_student_route(student_id: int, updates: StudentUpdate, db: Session = Depends(get_db)):
@@ -100,6 +105,7 @@ def update_student_route(student_id: int, updates: StudentUpdate, db: Session = 
     if not updated_student:
         raise HTTPException(status_code=404, detail="Student not found")
     return updated_student
+
 
 @router.delete("/{student_id}")
 def delete_student_route(student_id: int, db: Session = Depends(get_db)):

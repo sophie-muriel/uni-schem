@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.models.student_course import StudentCourse
 from fastapi import HTTPException, status
 
+
 def create_student_course(db: Session, relation: StudentCourse) -> StudentCourse:
     """
     Adds a new student-course enrollment to the database after validating no duplicates.
@@ -34,12 +35,12 @@ def create_student_course(db: Session, relation: StudentCourse) -> StudentCourse
         db.commit()
         db.refresh(relation)
         return relation
-    except Exception as e:
-        db.rollback()  
+    except Exception as exc:
+        db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An error occurred while registering the student in the course."
-        )
+        ) from exc
 
 
 def get_student_course_by_id(db: Session, relation_id: int) -> Optional[StudentCourse]:

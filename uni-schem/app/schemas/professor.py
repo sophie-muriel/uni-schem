@@ -43,7 +43,6 @@ class ProfessorCreate(ProfessorBase):
     Inherits:
         name, email, phone from ProfessorBase.
     """
-    pass
 
 
 class ProfessorUpdate(BaseModel):

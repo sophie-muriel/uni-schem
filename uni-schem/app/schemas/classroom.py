@@ -23,7 +23,6 @@ class ClassroomCreate(ClassroomBase):
     Inherits:
         name, capacity, location from ClassroomBase.
     """
-    pass
 
 
 class ClassroomUpdate(BaseModel):

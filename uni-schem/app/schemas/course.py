@@ -1,5 +1,5 @@
-from pydantic import BaseModel, constr
 from typing import Optional
+from pydantic import BaseModel, constr
 
 
 class CourseBase(BaseModel):
@@ -25,7 +25,6 @@ class CourseCreate(CourseBase):
     Inherits:
         name, code, semester, professor_id from CourseBase.
     """
-    pass
 
 
 class CourseUpdate(BaseModel):

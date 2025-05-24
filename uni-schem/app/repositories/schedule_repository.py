@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.models.student import Student
 from fastapi import HTTPException, status
 
+
 def create_student(db: Session, student: Student) -> Student:
     """
     Adds a new student to the database after validating the DNI is unique.
@@ -17,7 +18,8 @@ def create_student(db: Session, student: Student) -> Student:
     Raises:
         HTTPException: If a student with the same DNI already exists, raises a 400 error.
     """
-    existing_student = db.query(Student).filter(Student.dni == student.dni).first()
+    existing_student = db.query(Student).filter(
+        Student.dni == student.dni).first()
     if existing_student:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

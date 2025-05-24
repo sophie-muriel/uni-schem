@@ -4,6 +4,7 @@ from app.models.availability import Availability
 from app.schemas.availability import AvailabilityCreate, AvailabilityUpdate
 from app.repositories import availability_repository
 
+
 def register_availability(db: Session, data: AvailabilityCreate) -> Availability:
     """
     Registers a new availability entry for a professor.
@@ -19,9 +20,10 @@ def register_availability(db: Session, data: AvailabilityCreate) -> Availability
     existing_availability = availability_repository.get_availability_by_professor_and_time(
         db, data.professor_id, data.day, data.start_time, data.end_time
     )
-    
+
     if existing_availability:
-        raise ValueError("This professor already has availability at this time.")
+        raise ValueError(
+            "This professor already has availability at this time.")
 
     new_availability = Availability(
         professor_id=data.professor_id,
@@ -29,7 +31,7 @@ def register_availability(db: Session, data: AvailabilityCreate) -> Availability
         start_time=data.start_time,
         end_time=data.end_time,
     )
-    
+
     return availability_repository.create_availability(db, new_availability)
 
 

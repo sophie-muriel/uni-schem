@@ -83,7 +83,8 @@ def get_schedules_by_course_id_route(course_id: int, db: Session = Depends(get_d
     """
     schedules = schedule_service.get_schedules_by_course_id(db, course_id)
     if not schedules:
-        raise HTTPException(status_code=404, detail="No schedules found for this course")
+        raise HTTPException(
+            status_code=404, detail="No schedules found for this course")
     return schedules
 
 
@@ -102,9 +103,11 @@ def get_schedules_by_classroom_id_route(classroom_id: int, db: Session = Depends
     Raises:
         HTTPException: If no schedules are found, returns a 404 Not Found error.
     """
-    schedules = schedule_service.get_schedules_by_classroom_id(db, classroom_id)
+    schedules = schedule_service.get_schedules_by_classroom_id(
+        db, classroom_id)
     if not schedules:
-        raise HTTPException(status_code=404, detail="No schedules found for this classroom")
+        raise HTTPException(
+            status_code=404, detail="No schedules found for this classroom")
     return schedules
 
 
