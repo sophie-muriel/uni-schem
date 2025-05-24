@@ -11,7 +11,6 @@ from app.db.session import get_db
 
 router = APIRouter()
 
-# Ruta para crear una disponibilidad
 @router.post("/", response_model=AvailabilityOut)
 def create_availability_route(data: AvailabilityCreate, db: Session = Depends(get_db)):
     """
@@ -32,7 +31,6 @@ def create_availability_route(data: AvailabilityCreate, db: Session = Depends(ge
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
 
-# Ruta para listar todas las disponibilidades
 @router.get("/", response_model=List[AvailabilityOut])
 def list_availabilities_route(db: Session = Depends(get_db)):
     """
@@ -46,7 +44,6 @@ def list_availabilities_route(db: Session = Depends(get_db)):
     """
     return availability_service.list_availabilities(db)
 
-# Ruta para obtener una disponibilidad por ID
 @router.get("/{availability_id}", response_model=AvailabilityOut)
 def get_availability_route(availability_id: int, db: Session = Depends(get_db)):
     """
@@ -67,7 +64,6 @@ def get_availability_route(availability_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Availability not found")
     return availability
 
-# Ruta para actualizar una disponibilidad por ID
 @router.put("/{availability_id}", response_model=AvailabilityOut)
 def update_availability_route(
     availability_id: int, updates: AvailabilityUpdate, db: Session = Depends(get_db)
@@ -92,7 +88,6 @@ def update_availability_route(
         raise HTTPException(status_code=404, detail="Availability not found")
     return updated
 
-# Ruta para eliminar una disponibilidad por ID
 @router.delete("/{availability_id}")
 def delete_availability_route(availability_id: int, db: Session = Depends(get_db)):
     """
@@ -112,7 +107,6 @@ def delete_availability_route(availability_id: int, db: Session = Depends(get_db
         raise HTTPException(status_code=404, detail="Availability not found")
     return {"message": "Availability deleted successfully"}
 
-# Nueva ruta para obtener todas las disponibilidades de un profesor
 @router.get("/professor/{professor_id}", response_model=List[AvailabilityOut])
 def get_availabilities_by_professor_route(
     professor_id: int, db: Session = Depends(get_db)
