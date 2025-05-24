@@ -26,14 +26,14 @@ def create_course_route(course: CourseCreate, db: Session = Depends(get_db)):
         with the corresponding error message.
     """
     try:
-        # Verificar si el nombre del curso ya existe
+
         existing_course_by_name = db.query(Course).filter(
             Course.name == course.name).first()
         if existing_course_by_name:
             raise HTTPException(
                 status_code=400, detail="Course with this name already exists.")
 
-        # Verificar si el código del curso ya existe
+
         existing_course_by_code = db.query(Course).filter(
             Course.code == course.code).first()
         if existing_course_by_code:
