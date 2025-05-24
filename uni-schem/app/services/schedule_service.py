@@ -57,3 +57,31 @@ def remove_schedule(db: Session, schedule_id: int) -> bool:
     Deletes a schedule from the system.
     """
     return schedule_repository.delete_schedule(db, schedule_id)
+
+
+def get_schedules_by_course_id(db: Session, course_id: int) -> List[Schedule]:
+    """
+    Retrieves all schedules for a specific course by its ID.
+
+    Args:
+        db (Session): SQLAlchemy session.
+        course_id (int): The ID of the course.
+
+    Returns:
+        List[Schedule]: A list of schedules for the specified course.
+    """
+    return schedule_repository.get_schedules_by_course_id(db, course_id)
+
+
+def get_schedules_by_classroom_id(db: Session, classroom_id: int) -> List[Schedule]:
+    """
+    Retrieves all schedules for a specific classroom by its ID.
+
+    Args:
+        db (Session): SQLAlchemy session.
+        classroom_id (int): The ID of the classroom.
+
+    Returns:
+        List[Schedule]: A list of schedules for the specified classroom.
+    """
+    return schedule_repository.get_schedules_by_classroom_id(db, classroom_id)
