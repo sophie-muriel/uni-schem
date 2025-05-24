@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.models.schedule import Schedule
 from fastapi import HTTPException, status
 
+
 def create_schedule(db: Session, schedule: Schedule) -> Schedule:
     """
     Inserts a new schedule entry into the database after validating no overlap.
@@ -32,12 +33,12 @@ def create_schedule(db: Session, schedule: Schedule) -> Schedule:
         )
     try:
         db.add(schedule)
-        db.flush() 
-        db.commit() 
-        db.refresh(schedule)  
+        db.flush()
+        db.commit()
+        db.refresh(schedule)
         return schedule
     except Exception as e:
-        db.rollback()  
+        db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An error occurred while registering the timetable."

@@ -16,7 +16,7 @@ def register_availability(db: Session, data: AvailabilityCreate) -> Availability
     Returns:
         Availability: The newly created availability.
     """
-  
+
     existing_availability = availability_repository.get_availability_by_professor_and_time(
         db, data.professor_id, data.day, data.start_time, data.end_time
     )
