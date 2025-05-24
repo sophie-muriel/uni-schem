@@ -20,6 +20,8 @@ class ProfessorBase(BaseModel):
     def validate_phone(cls, v):
         """
         Ensure phone number is in a valid format (digits, +, (), -, space).
+        Raises:
+            ValueError: If the phone format is invalid.
         """
         if v and not re.match(r"^\+?[0-9\s\-\(\)]{7,15}$", v):
             raise ValueError("Invalid phone number format")
@@ -28,7 +30,9 @@ class ProfessorBase(BaseModel):
     @field_validator("name")
     def validate_name(cls, v):
         """
-        Ensure the name only contains letters, spaces, and apostrophes.
+        Ensure the name only contains letters (including accented), spaces, and apostrophes.
+        Raises:
+            ValueError: If the name contains invalid characters.
         """
         if not re.match(r"^[A-Za-z\s']+$", v):
             raise ValueError(

@@ -11,11 +11,11 @@ def register_schedule(db: Session, data: ScheduleCreate) -> Schedule:
     Registers a new schedule in the system.
 
     Args:
-        db (Session): SQLAlchemy session.
-        data (ScheduleCreate): Input data for the new schedule.
+        db (Session): SQLAlchemy session for interacting with the database.
+        data (ScheduleCreate): Input data containing course ID, day, start time, end time, and classroom ID.
 
     Returns:
-        Schedule: The created schedule.
+        Schedule: The newly created schedule.
     """
     new_schedule = Schedule(
         course_id=data.course_id,
@@ -29,14 +29,27 @@ def register_schedule(db: Session, data: ScheduleCreate) -> Schedule:
 
 def get_schedule(db: Session, schedule_id: int) -> Optional[Schedule]:
     """
-    Retrieves a schedule by its ID.
+    Retrieves a schedule by its unique ID.
+
+    Args:
+        db (Session): SQLAlchemy session.
+        schedule_id (int): The ID of the schedule to retrieve.
+
+    Returns:
+        Optional[Schedule]: The schedule if found, otherwise None.
     """
     return schedule_repository.get_schedule_by_id(db, schedule_id)
 
 
 def list_schedules(db: Session) -> List[Schedule]:
     """
-    Retrieves all schedules from the database.
+    Retrieves all schedules stored in the system.
+
+    Args:
+        db (Session): SQLAlchemy session.
+
+    Returns:
+        List[Schedule]: A list of all schedules.
     """
     return schedule_repository.get_all_schedules(db)
 
@@ -45,7 +58,15 @@ def modify_schedule(
     db: Session, schedule_id: int, updates: ScheduleUpdate
 ) -> Optional[Schedule]:
     """
-    Updates an existing schedule with new data.
+    Updates an existing schedule's details.
+
+    Args:
+        db (Session): SQLAlchemy session.
+        schedule_id (int): The ID of the schedule to update.
+        updates (ScheduleUpdate): Fields to update in the schedule.
+
+    Returns:
+        Optional[Schedule]: The updated schedule if found and modified, else None.
     """
     return schedule_repository.update_schedule(
         db, schedule_id, updates.dict(exclude_unset=True)
@@ -55,6 +76,13 @@ def modify_schedule(
 def remove_schedule(db: Session, schedule_id: int) -> bool:
     """
     Deletes a schedule from the system.
+
+    Args:
+        db (Session): SQLAlchemy session.
+        schedule_id (int): The ID of the schedule to delete.
+
+    Returns:
+        bool: True if the schedule was successfully deleted, False otherwise.
     """
     return schedule_repository.delete_schedule(db, schedule_id)
 

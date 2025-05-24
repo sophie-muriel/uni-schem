@@ -1,3 +1,23 @@
+"""
+Main application entry point for Uni-ScheM.
+
+This module sets up the FastAPI app instance, includes all route modules, 
+and initializes the database metadata using SQLAlchemy.
+
+Routes included:
+    - Availability
+    - Classroom
+    - Course
+    - Professor
+    - Schedule
+    - Student-Course relationships
+    - Student
+
+App Metadata:
+    - Title: Uni-ScheM
+    - Description: University Schedule Manager
+    - Contact: Sophie Muriel (https://github.com/sophie-muriel/uni-schem)
+"""
 from app.api.v1 import (availability_routes, classroom_routes, course_routes,
                         professor_routes, schedule_routes,
                         student_course_routes, student_routes)

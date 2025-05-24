@@ -27,7 +27,12 @@ class ClassroomCreate(ClassroomBase):
 
 class ClassroomUpdate(BaseModel):
     """
-    Schema for updating a classroom. All fields optional.
+    Schema for updating a classroom. All fields are optional to allow partial updates.
+
+    Attributes:
+        name (Optional[str]): Name or number of the classroom (max 50 characters).
+        capacity (Optional[int]): Maximum capacity of the classroom.
+        location (Optional[str]): Building or location info (max 100 characters).
     """
     name: Optional[constr(max_length=50)] = None
     capacity: Optional[int] = None

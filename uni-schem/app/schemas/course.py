@@ -29,12 +29,12 @@ class CourseCreate(CourseBase):
 
 class CourseUpdate(BaseModel):
     """
-    Schema for updating a course. All fields are optional.
+    Schema for updating a course. All fields are optional to allow partial updates.
 
     Attributes:
-        name (Optional[str]): Full name of the course.
-        code (Optional[str]): Code used to identify the course.
-        semester (Optional[str]): Semester when the course is offered.
+        name (Optional[str]): Full name of the course (max 100 characters).
+        code (Optional[str]): Code used to identify the course (max 20 characters).
+        semester (Optional[str]): Semester when the course is offered (max 20 characters).
         professor_id (Optional[int]): The ID of the professor teaching the course.
     """
     name: Optional[constr(max_length=100)] = None

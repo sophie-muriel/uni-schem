@@ -11,10 +11,10 @@ def register_student_course(db: Session, data: StudentCourseCreate) -> StudentCo
 
     Args:
         db (Session): SQLAlchemy session object.
-        data (StudentCourseCreate): Data for the new enrollment.
+        data (StudentCourseCreate): Data for the new enrollment, including student ID and course ID.
 
     Returns:
-        StudentCourse: The created enrollment.
+        StudentCourse: The newly created student-course relationship.
     """
     new_relation = StudentCourse(
         student_id=data.student_id,
@@ -25,14 +25,27 @@ def register_student_course(db: Session, data: StudentCourseCreate) -> StudentCo
 
 def get_student_course(db: Session, relation_id: int) -> Optional[StudentCourse]:
     """
-    Retrieves an enrollment by ID.
+    Retrieves a specific student-course enrollment by its unique ID.
+
+    Args:
+        db (Session): SQLAlchemy session object.
+        relation_id (int): The ID of the student-course relation.
+
+    Returns:
+        Optional[StudentCourse]: The enrollment if found, otherwise None.
     """
     return student_course_repository.get_student_course_by_id(db, relation_id)
 
 
 def list_student_courses(db: Session) -> List[StudentCourse]:
     """
-    Retrieves all student-course enrollments.
+    Retrieves all student-course enrollments from the database.
+
+    Args:
+        db (Session): SQLAlchemy session object.
+
+    Returns:
+        List[StudentCourse]: A list of all student-course relationships.
     """
     return student_course_repository.get_all_student_courses(db)
 
@@ -67,6 +80,13 @@ def get_courses_by_student_id(db: Session, student_id: int) -> List[StudentCours
 
 def remove_student_course(db: Session, relation_id: int) -> bool:
     """
-    Deletes an enrollment by ID.
+    Deletes a student-course enrollment by its unique ID.
+
+    Args:
+        db (Session): SQLAlchemy session object.
+        relation_id (int): The ID of the student-course relation to delete.
+
+    Returns:
+        bool: True if deletion was successful, False otherwise.
     """
     return student_course_repository.delete_student_course(db, relation_id)
