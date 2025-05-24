@@ -16,7 +16,7 @@ def register_course(db: Session, data: CourseCreate) -> Course:
     Returns:
         Course: The newly created course.
     """
-    # Crea la instancia sin course_id (lo asigna la BD)
+    
     new_course = Course(
         name=data.name,
         code=data.code,
@@ -33,6 +33,13 @@ def get_course(db: Session, course_id: int) -> Optional[Course]:
     return course_repository.get_course_by_id(db, course_id)
 
 
+def get_course_by_name(db: Session, name: str) -> Optional[Course]:
+    """
+    Retrieves a course by its name.
+    """
+    return course_repository.get_course_by_name(db, name)
+
+
 def list_courses(db: Session) -> List[Course]:
     """
     Returns a list of all courses.
@@ -40,9 +47,14 @@ def list_courses(db: Session) -> List[Course]:
     return course_repository.get_all_courses(db)
 
 
-def modify_course(
-    db: Session, course_id: int, updates: CourseUpdate
-) -> Optional[Course]:
+def get_courses_by_professor_id(db: Session, professor_id: int) -> List[Course]:
+    """
+    Retrieves courses by professor ID.
+    """
+    return course_repository.get_courses_by_professor_id(db, professor_id)
+
+
+def modify_course(db: Session, course_id: int, updates: CourseUpdate) -> Optional[Course]:
     """
     Updates a course with new data.
     """
