@@ -23,7 +23,6 @@ class Student(Base):
     name = Column(String(100), nullable=False)
     email = Column(String(320), unique=True, nullable=False)
     phone = Column(String(15), nullable=True)
-    dni = Column(String(20), unique=True, nullable=False)  # Nuevo campo DNI
-
-    # Relationship back to StudentCourse (enrollments)
+    dni = Column(String(20), unique=True, nullable=False)
+    
     enrollments = relationship("StudentCourse", back_populates="student")

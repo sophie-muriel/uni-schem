@@ -25,5 +25,4 @@ class Availability(Base):
     start_time = Column(Time, nullable=False)
     end_time = Column(Time, nullable=False)
 
-    # Relationship back to Professor
     professor = relationship("Professor", back_populates="availabilities")

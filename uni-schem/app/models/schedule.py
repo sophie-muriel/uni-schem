@@ -29,7 +29,6 @@ class Schedule(Base):
     end_time = Column(Time, nullable=False)
     classroom_id = Column(Integer, ForeignKey(
         "classroom.classroom_id"), nullable=False)
-
-    # Relationships back to Course and Classroom
+    
     course = relationship("Course",     back_populates="schedules")
     classroom = relationship("Classroom",  back_populates="schedules")
