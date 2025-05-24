@@ -2,7 +2,7 @@
 Main application entry point for Uni-ScheM.
 
 This module sets up the FastAPI app instance, includes all route modules, 
-and initializes the database metadata using SQLAlchemy.
+and initialIzes the database metadata using SQLAlchemy.
 
 Routes included:
     - Availability
