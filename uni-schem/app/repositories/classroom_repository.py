@@ -1,11 +1,12 @@
 from typing import List, Optional
 from sqlalchemy.orm import Session
 from app.models.classroom import Classroom
+from sqlalchemy.exc import SQLAlchemyError
 
 
 def create_classroom(db: Session, classroom: Classroom) -> Classroom:
     """
-    Inserts a new classroom into the database.
+    Inserts a new classroom into the database with transactional control to avoid auto-increment issues.
 
     Args:
         db (Session): SQLAlchemy session.
@@ -13,11 +14,21 @@ def create_classroom(db: Session, classroom: Classroom) -> Classroom:
 
     Returns:
         Classroom: The newly created classroom.
+
+    Raises:
+        SQLAlchemyError: If an error occurs during insertion, raises an exception to prevent ID increment.
     """
-    db.add(classroom)
-    db.commit()
-    db.refresh(classroom)
-    return classroom
+    try:
+        existing_classroom = db.query(Classroom).filter(Classroom.name == classroom.name).first()
+        if existing_classroom:
+            raise SQLAlchemyError("Classroom with this name already exists.")
+        db.add(classroom)
+        db.commit()
+        db.refresh(classroom)
+        return classroom
+    except SQLAlchemyError as e:
+        db.rollback()  
+        raise e  
 
 
 def get_classroom_by_id(db: Session, classroom_id: int) -> Optional[Classroom]:
@@ -34,6 +45,20 @@ def get_classroom_by_id(db: Session, classroom_id: int) -> Optional[Classroom]:
     return db.query(Classroom).filter(Classroom.classroom_id == classroom_id).first()
 
 
+def get_classroom_by_capacity(db: Session, capacity: int) -> List[Classroom]:
+    """
+    Retrieves classrooms by their capacity.
+
+    Args:
+        db (Session): SQLAlchemy session.
+        capacity (int): The capacity of the classroom to search for.
+
+    Returns:
+        List[Classroom]: A list of classrooms matching the capacity.
+    """
+    return db.query(Classroom).filter(Classroom.capacity == capacity).all()
+
+
 def get_all_classrooms(db: Session) -> List[Classroom]:
     """
     Retrieves all classrooms.
@@ -47,9 +72,7 @@ def get_all_classrooms(db: Session) -> List[Classroom]:
     return db.query(Classroom).all()
 
 
-def update_classroom(
-    db: Session, classroom_id: int, updates: dict
-) -> Optional[Classroom]:
+def update_classroom(db: Session, classroom_id: int, updates: dict) -> Optional[Classroom]:
     """
     Updates an existing classroom.
 
