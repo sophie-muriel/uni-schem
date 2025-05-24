@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 from app.db.database import Base
 
+
 class Student(Base):
     """
     Represents a student in the academic system.

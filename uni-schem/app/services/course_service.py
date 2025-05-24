@@ -16,7 +16,7 @@ def register_course(db: Session, data: CourseCreate) -> Course:
     Returns:
         Course: The newly created course.
     """
-    
+
     new_course = Course(
         name=data.name,
         code=data.code,

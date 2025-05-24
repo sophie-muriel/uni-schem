@@ -26,7 +26,6 @@ class AvailabilityCreate(AvailabilityBase):
     Inherits:
         AvailabilityBase: professor_id, day, start_time, end_time.
     """
-    pass
 
 
 class AvailabilityUpdate(BaseModel):

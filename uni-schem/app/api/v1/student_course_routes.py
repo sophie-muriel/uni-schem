@@ -10,6 +10,7 @@ from app.db.session import get_db
 
 router = APIRouter()
 
+
 @router.post("/", response_model=StudentCourseOut)
 def create_student_course_route(
     data: StudentCourseCreate, db: Session = Depends(get_db)
@@ -32,6 +33,7 @@ def create_student_course_route(
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
 
+
 @router.get("/", response_model=List[StudentCourseOut])
 def list_student_courses_route(db: Session = Depends(get_db)):
     """
@@ -44,6 +46,7 @@ def list_student_courses_route(db: Session = Depends(get_db)):
         List[StudentCourseOut]: A list of all registered student-course enrollments.
     """
     return student_course_service.list_student_courses(db)
+
 
 @router.get("/course/{course_id}", response_model=List[StudentCourseOut])
 def get_students_by_course_route(course_id: int, db: Session = Depends(get_db)):
@@ -62,8 +65,10 @@ def get_students_by_course_route(course_id: int, db: Session = Depends(get_db)):
     """
     relations = student_course_service.get_students_by_course_id(db, course_id)
     if not relations:
-        raise HTTPException(status_code=404, detail="No students found for this course")
+        raise HTTPException(
+            status_code=404, detail="No students found for this course")
     return relations
+
 
 @router.get("/student/{student_id}", response_model=List[StudentCourseOut])
 def get_courses_by_student_route(student_id: int, db: Session = Depends(get_db)):
@@ -80,10 +85,13 @@ def get_courses_by_student_route(student_id: int, db: Session = Depends(get_db))
     Raises:
         HTTPException: If no courses are found for the student, returns a 404 Not Found error.
     """
-    relations = student_course_service.get_courses_by_student_id(db, student_id)
+    relations = student_course_service.get_courses_by_student_id(
+        db, student_id)
     if not relations:
-        raise HTTPException(status_code=404, detail="No courses found for this student")
+        raise HTTPException(
+            status_code=404, detail="No courses found for this student")
     return relations
+
 
 @router.delete("/{relation_id}")
 def delete_student_course_route(relation_id: int, db: Session = Depends(get_db)):

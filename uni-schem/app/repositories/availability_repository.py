@@ -1,8 +1,9 @@
 from typing import List, Optional
+from datetime import time
 from sqlalchemy.orm import Session
 from app.models.availability import Availability
-from datetime import time
 from fastapi import HTTPException, status
+
 
 def create_availability(db: Session, availability: Availability) -> Availability:
     """
@@ -19,9 +20,10 @@ def create_availability(db: Session, availability: Availability) -> Availability
         HTTPException: If the availability overlaps with an existing availability.
     """
     existing_availability = get_availability_by_professor_and_time(
-        db, availability.professor_id, availability.day, availability.start_time, availability.end_time
+        db, availability.professor_id, availability.day, availability.start_time,
+        availability.end_time
     )
-    
+
     if existing_availability:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -65,7 +67,8 @@ def get_availability_by_professor_and_time(
     db: Session, professor_id: int, day: str, start_time: time, end_time: time
 ) -> Optional[Availability]:
     """
-    Verifies if there is any availability entry that overlaps with the new one for the same professor.
+    Verifies if there is any availability entry that overlaps with the new one for the same
+    professor.
 
     Args:
         db (Session): SQLAlchemy session.
@@ -80,8 +83,10 @@ def get_availability_by_professor_and_time(
     return db.query(Availability).filter(
         Availability.professor_id == professor_id,
         Availability.day == day,
-        Availability.start_time < end_time,  # The start time of the new availability should be before the existing end time
-        Availability.end_time > start_time   # The end time of the new availability should be after the existing start time
+        # The start time of the new availability should be before the existing end time
+        Availability.start_time < end_time,
+        # The end time of the new availability should be after the existing start time
+        Availability.end_time > start_time
     ).first()
 
 

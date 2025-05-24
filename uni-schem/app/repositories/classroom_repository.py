@@ -6,7 +6,8 @@ from sqlalchemy.exc import SQLAlchemyError
 
 def create_classroom(db: Session, classroom: Classroom) -> Classroom:
     """
-    Inserts a new classroom into the database with transactional control to avoid auto-increment issues.
+    Inserts a new classroom into the database with transactional control to avoid auto-increment
+    issues.
 
     Args:
         db (Session): SQLAlchemy session.
@@ -16,10 +17,12 @@ def create_classroom(db: Session, classroom: Classroom) -> Classroom:
         Classroom: The newly created classroom.
 
     Raises:
-        SQLAlchemyError: If an error occurs during insertion, raises an exception to prevent ID increment.
+        SQLAlchemyError: If an error occurs during insertion, raises an exception to prevent ID
+        increment.
     """
     try:
-        existing_classroom = db.query(Classroom).filter(Classroom.name == classroom.name).first()
+        existing_classroom = db.query(Classroom).filter(
+            Classroom.name == classroom.name).first()
         if existing_classroom:
             raise SQLAlchemyError("Classroom with this name already exists.")
         db.add(classroom)
@@ -27,8 +30,8 @@ def create_classroom(db: Session, classroom: Classroom) -> Classroom:
         db.refresh(classroom)
         return classroom
     except SQLAlchemyError as e:
-        db.rollback()  
-        raise e  
+        db.rollback()
+        raise e
 
 
 def get_classroom_by_id(db: Session, classroom_id: int) -> Optional[Classroom]:

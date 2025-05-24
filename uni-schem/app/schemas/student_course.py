@@ -1,5 +1,5 @@
-from pydantic import BaseModel
 from typing import Optional
+from pydantic import BaseModel
 
 
 class StudentCourseBase(BaseModel):
@@ -21,7 +21,6 @@ class StudentCourseCreate(StudentCourseBase):
     Inherits:
         student_id, course_id from StudentCourseBase.
     """
-    pass
 
 
 class StudentCourseUpdate(BaseModel):

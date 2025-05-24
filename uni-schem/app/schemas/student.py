@@ -15,7 +15,7 @@ class StudentBase(BaseModel):
     name: constr(max_length=100)
     email: EmailStr
     phone: Optional[constr(max_length=15)] = None
-    dni: constr(max_length=20)  
+    dni: constr(max_length=20)
 
 
 class StudentCreate(StudentBase):
@@ -23,7 +23,6 @@ class StudentCreate(StudentBase):
     Schema for creating a new student.
     Inherits: name, email, phone, dni from StudentBase.
     """
-    pass
 
 
 class StudentUpdate(BaseModel):

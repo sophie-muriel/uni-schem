@@ -3,10 +3,6 @@ from sqlalchemy.orm import Session
 from app.models.student import Student
 from fastapi import HTTPException, status
 
-from typing import List, Optional
-from sqlalchemy.orm import Session
-from fastapi import HTTPException, status
-from app.models.student import Student
 
 def create_student(db: Session, student: Student) -> Student:
     """
@@ -23,7 +19,8 @@ def create_student(db: Session, student: Student) -> Student:
         HTTPException: If the DNI already exists in the database.
     """
 
-    existing_student = db.query(Student).filter(Student.dni == student.dni).first()
+    existing_student = db.query(Student).filter(
+        Student.dni == student.dni).first()
     if existing_student:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -34,7 +31,6 @@ def create_student(db: Session, student: Student) -> Student:
     db.commit()
     db.refresh(student)
     return student
-
 
 
 def get_student_by_id(db: Session, student_id: int) -> Optional[Student]:

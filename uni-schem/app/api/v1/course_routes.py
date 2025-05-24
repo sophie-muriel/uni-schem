@@ -1,15 +1,13 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List, Optional
-from sqlalchemy.orm import Session
 from app.models.course import Course
-from sqlalchemy.exc import SQLAlchemyError
 from app.schemas.course import CourseCreate, CourseUpdate, CourseOut
 from app.services import course_service
 from app.db.session import get_db
 
 router = APIRouter()
+
 
 @router.post("/", response_model=CourseOut)
 def create_course_route(course: CourseCreate, db: Session = Depends(get_db)):
@@ -29,15 +27,19 @@ def create_course_route(course: CourseCreate, db: Session = Depends(get_db)):
     """
     try:
         # Verificar si el nombre del curso ya existe
-        existing_course_by_name = db.query(Course).filter(Course.name == course.name).first()
+        existing_course_by_name = db.query(Course).filter(
+            Course.name == course.name).first()
         if existing_course_by_name:
-            raise HTTPException(status_code=400, detail="Course with this name already exists.")
+            raise HTTPException(
+                status_code=400, detail="Course with this name already exists.")
 
         # Verificar si el código del curso ya existe
-        existing_course_by_code = db.query(Course).filter(Course.code == course.code).first()
+        existing_course_by_code = db.query(Course).filter(
+            Course.code == course.code).first()
         if existing_course_by_code:
-            raise HTTPException(status_code=400, detail="Course with this code already exists.")
-        
+            raise HTTPException(
+                status_code=400, detail="Course with this code already exists.")
+
         return course_service.register_course(db, course)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
@@ -95,7 +97,8 @@ def get_courses_by_professor_id_route(professor_id: int, db: Session = Depends(g
     """
     courses = course_service.get_courses_by_professor_id(db, professor_id)
     if not courses:
-        raise HTTPException(status_code=404, detail="No courses found for this professor")
+        raise HTTPException(
+            status_code=404, detail="No courses found for this professor")
     return courses
 
 

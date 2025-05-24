@@ -28,7 +28,6 @@ class ScheduleCreate(ScheduleBase):
     Inherits:
         course_id, day, start_time, end_time, classroom_id from ScheduleBase.
     """
-    pass
 
 
 class ScheduleUpdate(BaseModel):
