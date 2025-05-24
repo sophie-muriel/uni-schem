@@ -2,7 +2,6 @@ from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 from app.db.database import Base
 
-
 class Student(Base):
     """
     Represents a student in the academic system.
@@ -12,6 +11,7 @@ class Student(Base):
         name (str): Full name of the student.
         email (str): Valid email address of the student.
         phone (str): Contact phone number (up to 15 characters).
+        dni (str): The student's DNI (identity document) or ID number.
 
     Relationships:
         enrollments (List[StudentCourse]): Courses the student is enrolled in.
@@ -22,6 +22,7 @@ class Student(Base):
     name = Column(String(100), nullable=False)
     email = Column(String(320), unique=True, nullable=False)
     phone = Column(String(15), nullable=True)
+    dni = Column(String(20), unique=True, nullable=False)  # Nuevo campo DNI
 
     # Relationship back to StudentCourse (enrollments)
     enrollments = relationship("StudentCourse", back_populates="student")
