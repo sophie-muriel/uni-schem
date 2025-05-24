@@ -11,7 +11,7 @@ router = APIRouter()
 @router.post("/", response_model=ClassroomOut)
 def create_classroom_route(data: ClassroomCreate, db: Session = Depends(get_db)):
     """
-    Creates a new classroom entry.
+    Creates a new classroom entry after checking if the classroom name is unique.
 
     Args:
         data (ClassroomCreate): The classroom information to be registered.
@@ -21,7 +21,7 @@ def create_classroom_route(data: ClassroomCreate, db: Session = Depends(get_db))
         ClassroomOut: The newly created classroom record.
 
     Raises:
-        HTTPException: If a ValueError occurs during registration, returns a 400 Bad Request
+        HTTPException: If the classroom name already exists, raises 400 Bad Request
         with the corresponding error message.
     """
     try:
@@ -107,3 +107,18 @@ def delete_classroom_route(classroom_id: int, db: Session = Depends(get_db)):
     if not classroom_service.remove_classroom(db, classroom_id):
         raise HTTPException(status_code=404, detail="Classroom not found")
     return {"message": "Classroom deleted successfully"}
+
+
+@router.get("/capacity/{capacity}", response_model=List[ClassroomOut])
+def get_classrooms_by_capacity_route(capacity: int, db: Session = Depends(get_db)):
+    """
+    Retrieves classrooms by their capacity.
+
+    Args:
+        capacity (int): The capacity of classrooms to filter by.
+        db (Session): SQLAlchemy session, injected by FastAPI.
+
+    Returns:
+        List[ClassroomOut]: A list of classrooms matching the given capacity.
+    """
+    return classroom_service.get_classrooms_by_capacity(db, capacity)
