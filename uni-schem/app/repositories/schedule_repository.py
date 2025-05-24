@@ -28,7 +28,7 @@ def create_schedule(db: Session, schedule: Schedule) -> Schedule:
     if existing_schedule:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="El horario ya existe para este curso y salón en el mismo horario."
+            detail="The schedule already exists for this course and classroom in the same timetable."
         )
     try:
         db.add(schedule)
@@ -40,7 +40,7 @@ def create_schedule(db: Session, schedule: Schedule) -> Schedule:
         db.rollback()  
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Ocurrió un error al registrar el horario."
+            detail="An error occurred while registering the timetable."
         )
 
 
