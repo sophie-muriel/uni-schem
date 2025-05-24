@@ -1,6 +1,5 @@
 from typing import List, Optional
 from sqlalchemy.orm import Session
-
 from app.models.course import Course
 
 
@@ -33,6 +32,34 @@ def get_course_by_id(db: Session, course_id: int) -> Optional[Course]:
         Optional[Course]: The course if found, else None.
     """
     return db.query(Course).filter(Course.course_id == course_id).first()
+
+
+def get_course_by_name(db: Session, name: str) -> Optional[Course]:
+    """
+    Retrieves a course by its name.
+
+    Args:
+        db (Session): SQLAlchemy session.
+        name (str): Name of the course.
+
+    Returns:
+        Optional[Course]: The course if found, else None.
+    """
+    return db.query(Course).filter(Course.name == name).first()
+
+
+def get_courses_by_professor_id(db: Session, professor_id: int) -> List[Course]:
+    """
+    Retrieves courses by professor ID.
+
+    Args:
+        db (Session): SQLAlchemy session.
+        professor_id (int): Professor's unique ID.
+
+    Returns:
+        List[Course]: List of courses assigned to the professor.
+    """
+    return db.query(Course).filter(Course.professor_id == professor_id).all()
 
 
 def get_all_courses(db: Session) -> List[Course]:
