@@ -7,7 +7,7 @@ from app.repositories import classroom_repository
 
 def register_classroom(db: Session, data: ClassroomCreate) -> Classroom:
     """
-    Registers a new classroom.
+    Registers a new classroom after validating the name is unique.
 
     Args:
         db (Session): SQLAlchemy session.
@@ -16,12 +16,12 @@ def register_classroom(db: Session, data: ClassroomCreate) -> Classroom:
     Returns:
         Classroom: The created classroom.
     """
-
     new_classroom = Classroom(
         name=data.name,
         capacity=data.capacity,
         location=data.location,
     )
+
     return classroom_repository.create_classroom(db, new_classroom)
 
 
@@ -39,9 +39,14 @@ def list_classrooms(db: Session) -> List[Classroom]:
     return classroom_repository.get_all_classrooms(db)
 
 
-def modify_classroom(
-    db: Session, classroom_id: int, updates: ClassroomUpdate
-) -> Optional[Classroom]:
+def get_classrooms_by_capacity(db: Session, capacity: int) -> List[Classroom]:
+    """
+    Retrieves classrooms by their capacity.
+    """
+    return classroom_repository.get_classroom_by_capacity(db, capacity)
+
+
+def modify_classroom(db: Session, classroom_id: int, updates: ClassroomUpdate) -> Optional[Classroom]:
     """
     Updates an existing classroom.
     """
