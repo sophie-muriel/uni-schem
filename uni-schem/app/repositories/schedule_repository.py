@@ -1,91 +1,117 @@
 from typing import List, Optional
 from sqlalchemy.orm import Session
-from app.models.schedule import Schedule
+from app.models.student import Student
+from fastapi import HTTPException, status
 
-
-def create_schedule(db: Session, schedule: Schedule) -> Schedule:
+def create_student(db: Session, student: Student) -> Student:
     """
-    Adds a new schedule to the database.
+    Adds a new student to the database after validating the DNI is unique.
 
     Args:
         db (Session): SQLAlchemy session object.
-        schedule (Schedule): The schedule instance to insert.
+        student (Student): Student instance to be added.
 
     Returns:
-        Schedule: The newly created schedule.
+        Student: The newly added student.
+
+    Raises:
+        HTTPException: If a student with the same DNI already exists, raises a 400 error.
     """
-    db.add(schedule)
+    existing_student = db.query(Student).filter(Student.dni == student.dni).first()
+    if existing_student:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Student with this DNI already exists."
+        )
+
+    db.add(student)
     db.commit()
-    db.refresh(schedule)
-    return schedule
+    db.refresh(student)
+    return student
 
 
-def get_schedule_by_id(db: Session, schedule_id: int) -> Optional[Schedule]:
+def get_student_by_id(db: Session, student_id: int) -> Optional[Student]:
     """
-    Retrieves a schedule by its unique ID.
+    Retrieves a student by their ID.
 
     Args:
         db (Session): SQLAlchemy session object.
-        schedule_id (int): The ID of the schedule to retrieve.
+        student_id (int): The ID of the student.
 
     Returns:
-        Optional[Schedule]: The schedule if found, else None.
+        Optional[Student]: The student if found, else None.
     """
-    return db.query(Schedule).filter(Schedule.schedule_id == schedule_id).first()
+    return db.query(Student).filter(Student.student_id == student_id).first()
 
 
-def get_all_schedules(db: Session) -> List[Schedule]:
+def get_student_by_dni(db: Session, dni: str) -> Optional[Student]:
     """
-    Retrieves all schedules from the database.
+    Retrieves a student by their DNI.
+
+    Args:
+        db (Session): SQLAlchemy session object.
+        dni (str): The DNI of the student.
+
+    Returns:
+        Optional[Student]: The student if found, else None.
+    """
+    return db.query(Student).filter(Student.dni == dni).first()
+
+
+def get_all_students(db: Session) -> List[Student]:
+    """
+    Retrieves all students.
 
     Args:
         db (Session): SQLAlchemy session object.
 
     Returns:
-        List[Schedule]: A list of all schedules.
+        List[Student]: List of all students in the database.
     """
-    return db.query(Schedule).all()
+    return db.query(Student).all()
 
 
-def update_schedule(db: Session, schedule_id: int, updates: dict) -> Optional[Schedule]:
+def update_student(
+    db: Session, student_id: int, updated_data: dict
+) -> Optional[Student]:
     """
-    Updates an existing schedule.
+    Updates a student by ID.
 
     Args:
         db (Session): SQLAlchemy session object.
-        schedule_id (int): ID of the schedule to update.
-        updates (dict): Fields to be updated.
+        student_id (int): ID of the student to update.
+        updated_data (dict): Fields to be updated.
 
     Returns:
-        Optional[Schedule]: The updated schedule, or None if not found.
+        Optional[Student]: The updated student or None if not found.
     """
-    schedule = get_schedule_by_id(db, schedule_id)
-    if not schedule:
+    student = get_student_by_id(db, student_id)
+    if not student:
         return None
 
-    for key, value in updates.items():
-        setattr(schedule, key, value)
+    for key, value in updated_data.items():
+        setattr(student, key, value)
 
     db.commit()
-    db.refresh(schedule)
-    return schedule
+    db.refresh(student)
+    return student
 
 
-def delete_schedule(db: Session, schedule_id: int) -> bool:
+def delete_student(db: Session, student_id: int) -> bool:
     """
-    Deletes a schedule by ID.
+    Deletes a student by ID.
 
     Args:
         db (Session): SQLAlchemy session object.
-        schedule_id (int): ID of the schedule to delete.
+        student_id (int): ID of the student to delete.
 
     Returns:
         bool: True if deleted, False otherwise.
     """
-    schedule = get_schedule_by_id(db, schedule_id)
-    if not schedule:
+    student = get_student_by_id(db, student_id)
+    if not student:
         return False
 
-    db.delete(schedule)
+    db.delete(student)
     db.commit()
     return True
