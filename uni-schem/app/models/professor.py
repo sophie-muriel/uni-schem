@@ -23,6 +23,6 @@ class Professor(Base):
     name = Column(String(100), nullable=False)
     email = Column(String(320), unique=True, nullable=False)
     phone = Column(String(15), nullable=True)
-  
+
     courses = relationship("Course",       back_populates="professor")
     availabilities = relationship("Availability", back_populates="professor")

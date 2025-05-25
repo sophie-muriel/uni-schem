@@ -30,7 +30,7 @@ def register_availability(db: Session, data: AvailabilityCreate) -> Availability
         start_time=data.start_time,
         end_time=data.end_time,
     )
-    
+
     return availability_repository.create_availability(db, new_availability)
 
 

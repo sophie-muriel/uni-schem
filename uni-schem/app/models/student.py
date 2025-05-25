@@ -24,5 +24,5 @@ class Student(Base):
     email = Column(String(320), unique=True, nullable=False)
     phone = Column(String(15), nullable=True)
     dni = Column(String(20), unique=True, nullable=False)
-    
+
     enrollments = relationship("StudentCourse", back_populates="student")

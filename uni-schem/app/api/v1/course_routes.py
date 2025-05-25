@@ -33,7 +33,6 @@ def create_course_route(course: CourseCreate, db: Session = Depends(get_db)):
             raise HTTPException(
                 status_code=400, detail="Course with this name already exists.")
 
-
         existing_course_by_code = db.query(Course).filter(
             Course.code == course.code).first()
         if existing_course_by_code:

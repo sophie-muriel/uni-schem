@@ -1,4 +1,3 @@
-from datetime import time
 from sqlalchemy import Column, Integer, ForeignKey, Time, Enum as SQLEnum
 from sqlalchemy.orm import relationship
 from app.db.database import Base

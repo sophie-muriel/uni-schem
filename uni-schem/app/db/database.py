@@ -24,20 +24,3 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 Base.metadata.create_all(bind=engine)
-
-
-def get_db():
-    """
-    Dependency for FastAPI that provides a database session.
-
-    This function creates a new SQLAlchemy session for each request,
-    yields it to the path operation, and ensures it is closed once the request is finished.
-
-    Yields:
-        Session: A SQLAlchemy database session.
-    """
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
