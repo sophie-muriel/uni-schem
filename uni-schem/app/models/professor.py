@@ -24,6 +24,5 @@ class Professor(Base):
     email = Column(String(320), unique=True, nullable=False)
     phone = Column(String(15), nullable=True)
 
-    # Relationship back to Course and Availability
     courses = relationship("Course",       back_populates="professor")
     availabilities = relationship("Availability", back_populates="professor")

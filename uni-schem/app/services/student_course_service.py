@@ -25,14 +25,27 @@ def register_student_course(db: Session, data: StudentCourseCreate) -> StudentCo
 
 def get_student_course(db: Session, relation_id: int) -> Optional[StudentCourse]:
     """
-    Retrieves an enrollment by ID.
+    Retrieves a student-course enrollment by its unique ID.
+
+    Args:
+        db (Session): SQLAlchemy session object.
+        relation_id (int): The ID of the student-course relation to retrieve.
+
+    Returns:
+        Optional[StudentCourse]: The enrollment object if found, otherwise None.
     """
     return student_course_repository.get_student_course_by_id(db, relation_id)
 
 
 def list_student_courses(db: Session) -> List[StudentCourse]:
     """
-    Retrieves all student-course enrollments.
+    Retrieves all existing student-course enrollments.
+
+    Args:
+        db (Session): SQLAlchemy session object.
+
+    Returns:
+        List[StudentCourse]: A list of all student-course relationships stored in the database.
     """
     return student_course_repository.get_all_student_courses(db)
 
@@ -67,6 +80,13 @@ def get_courses_by_student_id(db: Session, student_id: int) -> List[StudentCours
 
 def remove_student_course(db: Session, relation_id: int) -> bool:
     """
-    Deletes an enrollment by ID.
+    Deletes a student-course enrollment by its ID.
+
+    Args:
+        db (Session): SQLAlchemy session object.
+        relation_id (int): The ID of the student-course relationship to delete.
+
+    Returns:
+        bool: True if the deletion was successful, False otherwise.
     """
     return student_course_repository.delete_student_course(db, relation_id)

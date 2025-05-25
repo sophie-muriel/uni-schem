@@ -27,28 +27,56 @@ def register_classroom(db: Session, data: ClassroomCreate) -> Classroom:
 
 def get_classroom(db: Session, classroom_id: int) -> Optional[Classroom]:
     """
-    Retrieves a classroom by ID.
+    Retrieves a classroom by its unique ID.
+
+    Args:
+        db (Session): Database session.
+        classroom_id (int): The ID of the classroom.
+
+    Returns:
+        Optional[Classroom]: The classroom object if found, otherwise None.
     """
     return classroom_repository.get_classroom_by_id(db, classroom_id)
 
 
 def list_classrooms(db: Session) -> List[Classroom]:
     """
-    Retrieves all classrooms.
+    Retrieves a list of all classrooms in the system.
+
+    Args:
+        db (Session): Database session.
+
+    Returns:
+        List[Classroom]: A list of all classroom records.
     """
     return classroom_repository.get_all_classrooms(db)
 
 
 def get_classrooms_by_capacity(db: Session, capacity: int) -> List[Classroom]:
     """
-    Retrieves classrooms by their capacity.
+    Retrieves classrooms that match the given capacity.
+
+    Args:
+        db (Session): Database session.
+        capacity (int): The desired classroom capacity to filter by.
+
+    Returns:
+        List[Classroom]: A list of classrooms with the specified capacity.
     """
     return classroom_repository.get_classroom_by_capacity(db, capacity)
 
 
 def modify_classroom(db: Session, classroom_id: int, updates: ClassroomUpdate) -> Optional[Classroom]:
     """
-    Updates an existing classroom.
+    Updates the details of an existing classroom.
+
+    Args:
+        db (Session): Database session.
+        classroom_id (int): ID of the classroom to be updated.
+        updates (ClassroomUpdate): The fields to update.
+
+    Returns:
+        Optional[Classroom]: The updated classroom, or None if not found.
     """
     return classroom_repository.update_classroom(
         db, classroom_id, updates.dict(exclude_unset=True)
@@ -57,6 +85,13 @@ def modify_classroom(db: Session, classroom_id: int, updates: ClassroomUpdate) -
 
 def remove_classroom(db: Session, classroom_id: int) -> bool:
     """
-    Deletes a classroom from the system.
+    Deletes a classroom by its ID.
+
+    Args:
+        db (Session): Database session.
+        classroom_id (int): ID of the classroom to delete.
+
+    Returns:
+        bool: True if deletion was successful, False if the classroom was not found.
     """
     return classroom_repository.delete_classroom(db, classroom_id)

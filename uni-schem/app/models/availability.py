@@ -1,4 +1,3 @@
-from datetime import time
 from sqlalchemy import Column, Integer, ForeignKey, Time, Enum as SQLEnum
 from sqlalchemy.orm import relationship
 from app.db.database import Base
@@ -25,5 +24,4 @@ class Availability(Base):
     start_time = Column(Time, nullable=False)
     end_time = Column(Time, nullable=False)
 
-    # Relationship back to Professor
     professor = relationship("Professor", back_populates="availabilities")

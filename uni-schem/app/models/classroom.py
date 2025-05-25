@@ -22,6 +22,4 @@ class Classroom(Base):
     name = Column(String(50), nullable=False)
     capacity = Column(Integer, nullable=False)
     location = Column(String(100), nullable=True)
-
-    # Relationship back to Schedule
     schedules = relationship("Schedule", back_populates="classroom")

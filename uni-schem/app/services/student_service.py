@@ -8,16 +8,18 @@ from fastapi import HTTPException
 
 def register_student(db: Session, data: StudentCreate) -> Student:
     """
-    Registers a new student.
+    Registers a new student in the system.
 
     Args:
         db (Session): SQLAlchemy session.
-        data (StudentCreate): Input data for the student.
+        data (StudentCreate): Input data for the new student.
 
     Returns:
-        Student: The newly created student.
-    """
+        Student: The newly created student object.
 
+    Raises:
+        HTTPException: If a student with the same DNI already exists.
+    """
     existing_student_by_dni = db.query(Student).filter(
         Student.dni == data.dni).first()
     if existing_student_by_dni:
@@ -35,7 +37,14 @@ def register_student(db: Session, data: StudentCreate) -> Student:
 
 def get_student(db: Session, student_id: int) -> Optional[Student]:
     """
-    Fetches a student by their ID.
+    Retrieves a student by their unique ID.
+
+    Args:
+        db (Session): SQLAlchemy session.
+        student_id (int): The student's ID.
+
+    Returns:
+        Optional[Student]: The student object if found, otherwise None.
     """
     return student_repository.get_student_by_id(db, student_id)
 
@@ -56,7 +65,13 @@ def get_student_by_dni(db: Session, dni: str) -> Optional[Student]:
 
 def list_students(db: Session) -> List[Student]:
     """
-    Returns all students.
+    Retrieves all students stored in the database.
+
+    Args:
+        db (Session): SQLAlchemy session.
+
+    Returns:
+        List[Student]: A list of all student records.
     """
     return student_repository.get_all_students(db)
 
@@ -65,7 +80,15 @@ def modify_student(
     db: Session, student_id: int, updates: StudentUpdate
 ) -> Optional[Student]:
     """
-    Updates the student with the provided data.
+    Updates a student's data based on the provided fields.
+
+    Args:
+        db (Session): SQLAlchemy session.
+        student_id (int): ID of the student to update.
+        updates (StudentUpdate): Fields to update.
+
+    Returns:
+        Optional[Student]: The updated student object, if update was successful.
     """
     return student_repository.update_student(
         db, student_id, updates.dict(exclude_unset=True)
@@ -74,6 +97,13 @@ def modify_student(
 
 def remove_student(db: Session, student_id: int) -> bool:
     """
-    Deletes a student by ID.
+    Deletes a student record from the database by ID.
+
+    Args:
+        db (Session): SQLAlchemy session.
+        student_id (int): ID of the student to delete.
+
+    Returns:
+        bool: True if deletion was successful, False otherwise.
     """
     return student_repository.delete_student(db, student_id)

@@ -8,7 +8,7 @@ class AvailabilityBase(BaseModel):
     Shared attributes for professor availability.
 
     Attributes:
-        professor_id (int): The ID of the professor.
+        professor_id (int): The id of the professor.
         day (Day): Day of the week.
         start_time (time): Start time of the availability slot.
         end_time (time): End time of the availability slot.
@@ -30,7 +30,13 @@ class AvailabilityCreate(AvailabilityBase):
 
 class AvailabilityUpdate(BaseModel):
     """
-    Schema for updating availability fields. All fields optional.
+    Schema for updating availability fields. All fields are optional to allow partial updates.
+
+    Attributes:
+        professor_id (Optional[int]): Updated professor ID.
+        day (Optional[Day]): Updated day of the week.
+        start_time (Optional[time]): Updated start time.
+        end_time (Optional[time]): Updated end time.
     """
     professor_id: int | None = None
     day: Day | None = None
