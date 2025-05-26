@@ -1,5 +1,6 @@
 from typing import Optional
-from pydantic import BaseModel, EmailStr, constr
+from pydantic import BaseModel, EmailStr, constr, validator
+import re
 
 
 class StudentBase(BaseModel):
@@ -9,13 +10,34 @@ class StudentBase(BaseModel):
     Attributes:
         name (str): Full name of the student (max 100 characters).
         email (EmailStr): Valid email address of the student.
-        phone (Optional[str]): Contact phone number (up to 15 characters).
-        dni (str): Unique identifier (DNI or equivalent).
+        phone (Optional[str]): Contact phone number (max 10 characters).
+        dni (str): Unique identifier (DNI or equivalent), length between 6 and 10.
     """
     name: constr(max_length=100)
     email: EmailStr
-    phone: Optional[constr(max_length=15)] = None
-    dni: constr(max_length=20)
+    phone: Optional[constr(max_length=10)] = None
+    dni: constr(min_length=6, max_length=10)
+
+    @validator('phone')
+    def validate_phone(cls, v):
+        if v:
+            if not v.isdigit():
+                raise ValueError('Phone number must contain only digits')
+            if len(v) != 10:
+                raise ValueError('Phone number must be exactly 10 digits')
+        return v
+
+    @validator('dni')
+    def validate_dni(cls, v):
+        if not v.isdigit():
+            raise ValueError('DNI must contain only digits')
+        return v
+
+    @validator('name')
+    def validate_name(cls, v):
+        if not re.match("^[a-zA-Z ]*$", v):
+            raise ValueError('Name must contain only letters and spaces, no accents')
+        return v
 
 
 class StudentCreate(StudentBase):
@@ -23,6 +45,7 @@ class StudentCreate(StudentBase):
     Schema for creating a new student.
     Inherits: name, email, phone, dni from StudentBase.
     """
+    pass
 
 
 class StudentUpdate(BaseModel):
@@ -37,8 +60,8 @@ class StudentUpdate(BaseModel):
     """
     name: Optional[constr(max_length=100)] = None
     email: Optional[EmailStr] = None
-    phone: Optional[constr(max_length=15)] = None
-    dni: Optional[constr(max_length=20)] = None
+    phone: Optional[constr(max_length=10)] = None
+    dni: Optional[constr(min_length=6, max_length=10)] = None
 
 
 class StudentOut(StudentBase):
