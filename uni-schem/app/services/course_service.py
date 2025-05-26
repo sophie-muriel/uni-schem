@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session
 from app.models.course import Course
 from app.schemas.course import CourseCreate, CourseUpdate
 from app.repositories import course_repository
+from fastapi import HTTPException, status
+from app.repositories import professor_repository
 
 
 def register_course(db: Session, data: CourseCreate) -> Course:
@@ -16,13 +18,27 @@ def register_course(db: Session, data: CourseCreate) -> Course:
     Returns:
         Course: The newly created course.
     """
+    professor = professor_repository.get_professor_by_id(db, data.professor_id)
+    if not professor:
+        raise HTTPException(
+            status_code=404, detail="Professor not found"
+        )
+
     new_course = Course(
         name=data.name,
         code=data.code,
         semester=data.semester,
         professor_id=data.professor_id,
     )
-    return course_repository.create_course(db, new_course)
+
+    try:
+        return course_repository.create_course(db, new_course)
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An error occurred while creating the course."
+        )
 
 
 def get_course(db: Session, course_id: int) -> Optional[Course]:
@@ -92,6 +108,13 @@ def modify_course(db: Session, course_id: int, updates: CourseUpdate) -> Optiona
     Returns:
         Optional[Course]: The updated course if found, else None.
     """
+    if updates.professor_id:
+        professor = professor_repository.get_professor_by_id(db, updates.professor_id)
+        if not professor:
+            raise HTTPException(
+                status_code=404, detail="Professor not found"
+            )
+
     return course_repository.update_course(
         db, course_id, updates.dict(exclude_unset=True)
     )
