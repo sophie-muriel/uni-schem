@@ -1,7 +1,6 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-
 from app.schemas.schedule import ScheduleCreate, ScheduleUpdate, ScheduleOut
 from app.services import schedule_service
 from app.db.session import get_db
@@ -12,7 +11,7 @@ router = APIRouter()
 @router.post("/", response_model=ScheduleOut)
 def create_schedule_route(schedule: ScheduleCreate, db: Session = Depends(get_db)):
     """
-    Creates a new schedule entry.
+    Creates a new schedule entry after checking if the course and classroom exist and if the schedule doesn't overlap.
 
     Args:
         schedule (ScheduleCreate): The schedule data to be registered.
@@ -22,13 +21,17 @@ def create_schedule_route(schedule: ScheduleCreate, db: Session = Depends(get_db
         ScheduleOut: The newly created schedule record.
 
     Raises:
-        HTTPException: If a ValueError occurs during registration, returns a 400 Bad Request
-        with the error message.
+        HTTPException: If a course_id or classroom_id doesn't exist or the schedule overlaps, returns a 404 Not Found
+        with the corresponding error message.
     """
     try:
         return schedule_service.register_schedule(db, schedule)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e)) from e
+    except HTTPException as e:
+        db.rollback()
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="An error occurred during schedule creation.")
 
 
 @router.get("/", response_model=List[ScheduleOut])
@@ -79,7 +82,7 @@ def get_schedules_by_course_id_route(course_id: int, db: Session = Depends(get_d
         List[ScheduleOut]: A list of schedules for the specified course.
 
     Raises:
-        HTTPException: If no schedules are found, returns a 404 Not Found error.
+        HTTPException: If no schedules are found for the course, returns a 404 Not Found error.
     """
     schedules = schedule_service.get_schedules_by_course_id(db, course_id)
     if not schedules:
@@ -101,10 +104,9 @@ def get_schedules_by_classroom_id_route(classroom_id: int, db: Session = Depends
         List[ScheduleOut]: A list of schedules for the specified classroom.
 
     Raises:
-        HTTPException: If no schedules are found, returns a 404 Not Found error.
+        HTTPException: If no schedules are found for the classroom, returns a 404 Not Found error.
     """
-    schedules = schedule_service.get_schedules_by_classroom_id(
-        db, classroom_id)
+    schedules = schedule_service.get_schedules_by_classroom_id(db, classroom_id)
     if not schedules:
         raise HTTPException(
             status_code=404, detail="No schedules found for this classroom")
