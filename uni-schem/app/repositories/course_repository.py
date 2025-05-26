@@ -1,11 +1,14 @@
 from typing import List, Optional
 from sqlalchemy.orm import Session
 from app.models.course import Course
+from app.models.professor import Professor
+from fastapi import HTTPException, status
+from app.models.schedule import Schedule
 
 
 def create_course(db: Session, course: Course) -> Course:
     """
-    Adds a new course to the database.
+    Adds a new course to the database after validating the professor exists.
 
     Args:
         db (Session): SQLAlchemy session.
@@ -13,7 +16,17 @@ def create_course(db: Session, course: Course) -> Course:
 
     Returns:
         Course: The created course.
+
+    Raises:
+        HTTPException: If the professor does not exist.
     """
+    professor = db.query(Professor).filter(Professor.professor_id == course.professor_id).first()
+    if not professor:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Professor not found"
+        )
+
     db.add(course)
     db.commit()
     db.refresh(course)
@@ -91,6 +104,14 @@ def update_course(db: Session, course_id: int, updates: dict) -> Optional[Course
     if not course:
         return None
 
+    if 'professor_id' in updates:
+        professor = db.query(Professor).filter(Professor.professor_id == updates['professor_id']).first()
+        if not professor:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Professor not found"
+            )
+
     for key, value in updates.items():
         setattr(course, key, value)
 
@@ -101,19 +122,25 @@ def update_course(db: Session, course_id: int, updates: dict) -> Optional[Course
 
 def delete_course(db: Session, course_id: int) -> bool:
     """
-    Deletes a course by ID.
-
+    Deletes a course and updates all related schedule entries by setting course_id to NULL.
+    
     Args:
         db (Session): SQLAlchemy session.
-        course_id (int): ID of the course.
-
+        course_id (int): ID of the course to delete.
+        
     Returns:
-        bool: True if deleted, False otherwise.
+        bool: True if the course was successfully deleted, False otherwise.
     """
     course = get_course_by_id(db, course_id)
     if not course:
         return False
 
+    db.query(Schedule).filter(Schedule.course_id == course_id).update({"course_id": None}, synchronize_session=False)
+    course = db.query(Course).filter(Course.course_id == course_id).first()
+    
+    if not course:
+        return False
+    
     db.delete(course)
     db.commit()
     return True
