@@ -1,14 +1,16 @@
 from typing import List, Optional
 from sqlalchemy.orm import Session
-
+from fastapi import HTTPException, status
 from app.models.schedule import Schedule
 from app.schemas.schedule import ScheduleCreate, ScheduleUpdate
 from app.repositories import schedule_repository
+from app.repositories import course_repository, classroom_repository
 
 
 def register_schedule(db: Session, data: ScheduleCreate) -> Schedule:
     """
-    Registers a new schedule in the system.
+    Registers a new schedule in the system after validating course and classroom existence,
+    and checking for conflicts.
 
     Args:
         db (Session): SQLAlchemy session for interacting with the database.
@@ -17,12 +19,52 @@ def register_schedule(db: Session, data: ScheduleCreate) -> Schedule:
     Returns:
         Schedule: The newly created schedule.
     """
+    course = course_repository.get_course_by_id(db, data.course_id)
+    if not course:
+        raise HTTPException(
+            status_code=404,
+            detail="Course not found"
+        )
+
+    classroom = classroom_repository.get_classroom_by_id(db, data.classroom_id)
+    if not classroom:
+        raise HTTPException(
+            status_code=404,
+            detail="Classroom not found"
+        )
+
+    existing_schedule_for_course = db.query(Schedule).filter(
+        Schedule.course_id == data.course_id,
+        Schedule.day == data.day,
+        Schedule.start_time == data.start_time,
+        Schedule.end_time == data.end_time
+    ).first()
+
+    if existing_schedule_for_course:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Course is already scheduled at the same time."
+        )
+
+    existing_schedule_in_classroom = db.query(Schedule).filter(
+        Schedule.classroom_id == data.classroom_id,
+        Schedule.day == data.day,
+        Schedule.start_time == data.start_time,
+        Schedule.end_time == data.end_time
+    ).first()
+
+    if existing_schedule_in_classroom:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Classroom is already booked at this time."
+        )
+
     new_schedule = Schedule(
         course_id=data.course_id,
+        classroom_id=data.classroom_id,
         day=data.day,
         start_time=data.start_time,
         end_time=data.end_time,
-        classroom_id=data.classroom_id,
     )
     return schedule_repository.create_schedule(db, new_schedule)
 
@@ -63,7 +105,7 @@ def modify_schedule(
     Args:
         db (Session): SQLAlchemy session.
         schedule_id (int): The ID of the schedule to update.
-        updates (ScheduleUpdate): Fields to update in the schedule.
+        updates (ScheduleUpdate): The fields to update in the schedule.
 
     Returns:
         Optional[Schedule]: The updated schedule if found and modified, else None.
