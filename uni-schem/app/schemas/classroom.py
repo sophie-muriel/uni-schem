@@ -1,5 +1,5 @@
 from typing import Optional
-from pydantic import BaseModel, constr
+from pydantic import BaseModel, constr, conint
 
 
 class ClassroomBase(BaseModel):
@@ -8,11 +8,11 @@ class ClassroomBase(BaseModel):
 
     Attributes:
         name (str): Name or number of the classroom (max 50 characters).
-        capacity (int): Maximum number of students the classroom can hold.
+        capacity (int): Maximum number of students the classroom can hold (5-40).
         location (Optional[str]): Building or location info (up to 100 chars).
     """
     name: constr(max_length=50)
-    capacity: int
+    capacity: conint(ge=5, le=40)
     location: Optional[constr(max_length=100)] = None
 
 
@@ -31,11 +31,11 @@ class ClassroomUpdate(BaseModel):
 
     Attributes:
         name (Optional[str]): Name or number of the classroom (max 50 characters).
-        capacity (Optional[int]): Maximum capacity of the classroom.
+        capacity (Optional[int]): Maximum capacity of the classroom (5-40).
         location (Optional[str]): Building or location info (max 100 characters).
     """
     name: Optional[constr(max_length=50)] = None
-    capacity: Optional[int] = None
+    capacity: Optional[conint(ge=5, le=40)] = None
     location: Optional[constr(max_length=100)] = None
 
 
