@@ -1,13 +1,14 @@
 from typing import List, Optional
 from sqlalchemy.orm import Session
 from app.models.classroom import Classroom
-from sqlalchemy.exc import SQLAlchemyError
+from fastapi import HTTPException, status
+from app.models.schedule import Schedule
 
 
 def create_classroom(db: Session, classroom: Classroom) -> Classroom:
     """
     Inserts a new classroom into the database with transactional control to avoid auto-increment
-    issues.
+    issues and validates that the classroom name is unique.
 
     Args:
         db (Session): SQLAlchemy session.
@@ -17,21 +18,33 @@ def create_classroom(db: Session, classroom: Classroom) -> Classroom:
         Classroom: The newly created classroom.
 
     Raises:
-        SQLAlchemyError: If an error occurs during insertion, raises an exception to prevent ID
-        increment.
+        HTTPException: If a classroom with the same name already exists, raises 400 Bad Request.
     """
+    existing_classroom = db.query(Classroom).filter(
+        Classroom.name == classroom.name).first()
+    if existing_classroom:
+        raise HTTPException(
+            status_code=400,
+            detail="A classroom with this name already exists."
+        )
+    
+    if classroom.capacity < 5 or classroom.capacity > 40:
+        raise HTTPException(
+            status_code=400,
+            detail="Classroom capacity must be between 5 and 40."
+        )
+    
     try:
-        existing_classroom = db.query(Classroom).filter(
-            Classroom.name == classroom.name).first()
-        if existing_classroom:
-            raise SQLAlchemyError("Classroom with this name already exists.")
         db.add(classroom)
         db.commit()
         db.refresh(classroom)
         return classroom
-    except SQLAlchemyError as e:
+    except Exception as e:
         db.rollback()
-        raise e
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An error occurred while creating the classroom."
+        )
 
 
 def get_classroom_by_id(db: Session, classroom_id: int) -> Optional[Classroom]:
@@ -101,15 +114,17 @@ def update_classroom(db: Session, classroom_id: int, updates: dict) -> Optional[
 
 def delete_classroom(db: Session, classroom_id: int) -> bool:
     """
-    Deletes a classroom from the database.
-
+    Deletes a classroom and updates all related schedule entries by setting classroom_id to NULL.
+    
     Args:
         db (Session): SQLAlchemy session.
-        classroom_id (int): The ID of the classroom to delete.
-
+        classroom_id (int): ID of the classroom to delete.
+        
     Returns:
-        bool: True if deleted, False if not found.
+        bool: True if the classroom was successfully deleted, False otherwise.
     """
+    db.query(Schedule).filter(Schedule.classroom_id == classroom_id).update({"classroom_id": None}, synchronize_session=False)
+    
     classroom = get_classroom_by_id(db, classroom_id)
     if not classroom:
         return False
