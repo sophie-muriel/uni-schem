@@ -21,7 +21,7 @@ class StudentCourse(Base):
     student_course_id = Column(Integer, primary_key=True, index=True)
     student_id = Column(Integer, ForeignKey(
         "student.student_id"), nullable=False)
-    course_id = Column(Integer, ForeignKey("course.course_id"), nullable=False)
+    course_id = Column(Integer, ForeignKey("course.course_id", ondelete="CASCADE"), nullable=True)
 
     student = relationship("Student", back_populates="enrollments")
     course = relationship("Course",  back_populates="enrollments")
