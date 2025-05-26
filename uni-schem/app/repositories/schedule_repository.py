@@ -1,12 +1,15 @@
 from typing import List, Optional
 from sqlalchemy.orm import Session
 from app.models.schedule import Schedule
+from app.models.course import Course
+from app.models.classroom import Classroom
 from fastapi import HTTPException, status
 
 
 def create_schedule(db: Session, schedule: Schedule) -> Schedule:
     """
-    Inserts a new schedule entry into the database after validating no overlap.
+    Inserts a new schedule entry into the database after validating course and classroom existence,
+    and checking for conflicts in the timetable.
 
     Args:
         db (Session): SQLAlchemy session.
@@ -16,34 +19,53 @@ def create_schedule(db: Session, schedule: Schedule) -> Schedule:
         Schedule: The newly created schedule.
 
     Raises:
-        HTTPException: If the schedule overlaps with an existing schedule.
+        HTTPException: If the course or classroom does not exist or if the schedule overlaps with an existing schedule.
     """
-    existing_schedule = db.query(Schedule).filter(
+    course = db.query(Course).filter(Course.course_id == schedule.course_id).first()
+    if not course:
+        raise HTTPException(
+            status_code=404,
+            detail="Course not found"
+        )
+
+    classroom = db.query(Classroom).filter(Classroom.classroom_id == schedule.classroom_id).first()
+    if not classroom:
+        raise HTTPException(
+            status_code=404,
+            detail="Classroom not found"
+        )
+
+    existing_schedule_for_course = db.query(Schedule).filter(
         Schedule.course_id == schedule.course_id,
+        Schedule.day == schedule.day,
+        Schedule.start_time == schedule.start_time,
+        Schedule.end_time == schedule.end_time
+    ).first()
+
+    if existing_schedule_for_course:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Course is already scheduled at the same time."
+        )
+
+    existing_schedule_in_classroom = db.query(Schedule).filter(
         Schedule.classroom_id == schedule.classroom_id,
         Schedule.day == schedule.day,
         Schedule.start_time == schedule.start_time,
         Schedule.end_time == schedule.end_time
     ).first()
 
-    if existing_schedule:
+    if existing_schedule_in_classroom:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="The schedule already exists for this course and classroom in the same"
-            "timetable."
+            detail="Classroom is already booked at this time."
         )
-    try:
-        db.add(schedule)
-        db.flush()
-        db.commit()
-        db.refresh(schedule)
-        return schedule
-    except Exception:
-        db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="An error occurred while registering the timetable."
-        )
+
+    db.add(schedule)
+    db.flush()
+    db.commit()
+    db.refresh(schedule)
+    return schedule
 
 
 def get_schedule_by_id(db: Session, schedule_id: int) -> Optional[Schedule]:
@@ -127,18 +149,23 @@ def update_schedule(db: Session, schedule_id: int, updates: dict) -> Optional[Sc
 
 def delete_schedule(db: Session, schedule_id: int) -> bool:
     """
-    Deletes a schedule by ID.
+    Deletes a schedule from the system by its ID.
 
     Args:
         db (Session): SQLAlchemy session object.
-        schedule_id (int): ID of the schedule to delete.
+        schedule_id (int): The ID of the schedule to delete.
 
     Returns:
-        bool: True if deleted, False otherwise.
+        bool: True if the schedule was successfully deleted, False otherwise.
     """
     schedule = get_schedule_by_id(db, schedule_id)
     if not schedule:
         return False
+
+    if schedule.course:
+        db.delete(schedule.course)
+    if schedule.classroom:
+        schedule.classroom_id = None
 
     db.delete(schedule)
     db.commit()
