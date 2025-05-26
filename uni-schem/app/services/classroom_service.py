@@ -3,11 +3,12 @@ from sqlalchemy.orm import Session
 from app.models.classroom import Classroom
 from app.schemas.classroom import ClassroomCreate, ClassroomUpdate
 from app.repositories import classroom_repository
+from fastapi import HTTPException, status
 
 
 def register_classroom(db: Session, data: ClassroomCreate) -> Classroom:
     """
-    Registers a new classroom after validating the name is unique.
+    Registers a new classroom after validating the name is unique and capacity is valid.
 
     Args:
         db (Session): SQLAlchemy session.
@@ -16,13 +17,31 @@ def register_classroom(db: Session, data: ClassroomCreate) -> Classroom:
     Returns:
         Classroom: The created classroom.
     """
+    existing_classroom_by_name = db.query(Classroom).filter(Classroom.name == data.name).first()
+    if existing_classroom_by_name:
+        raise HTTPException(
+            status_code=400, detail="A classroom with this name already exists."
+        )
+
+    if data.capacity < 5 or data.capacity > 40:
+        raise HTTPException(
+            status_code=400, detail="Classroom capacity must be between 5 and 40."
+        )
+
     new_classroom = Classroom(
         name=data.name,
         capacity=data.capacity,
         location=data.location,
     )
 
-    return classroom_repository.create_classroom(db, new_classroom)
+    try:
+        return classroom_repository.create_classroom(db, new_classroom)
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An error occurred while creating the classroom."
+        )
 
 
 def get_classroom(db: Session, classroom_id: int) -> Optional[Classroom]:
