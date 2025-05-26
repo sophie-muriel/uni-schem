@@ -4,14 +4,15 @@ from sqlalchemy.orm import Session
 from app.schemas.classroom import ClassroomCreate, ClassroomUpdate, ClassroomOut
 from app.services import classroom_service
 from app.db.session import get_db
+from app.models.classroom import Classroom
 
 router = APIRouter()
-
 
 @router.post("/", response_model=ClassroomOut)
 def create_classroom_route(data: ClassroomCreate, db: Session = Depends(get_db)):
     """
-    Creates a new classroom entry after checking if the classroom name is unique.
+    Creates a new classroom entry after checking if the classroom name is unique,
+    and ensuring the capacity is within valid bounds.
 
     Args:
         data (ClassroomCreate): The classroom information to be registered.
@@ -21,9 +22,20 @@ def create_classroom_route(data: ClassroomCreate, db: Session = Depends(get_db))
         ClassroomOut: The newly created classroom record.
 
     Raises:
-        HTTPException: If the classroom name already exists, raises 400 Bad Request
-        with the corresponding error message.
+        HTTPException: If the classroom name already exists or if the capacity is invalid.
     """
+    if data.capacity < 5 or data.capacity > 40:
+        raise HTTPException(
+            status_code=400,
+            detail="Classroom capacity must be between 5 and 40."
+        )
+
+    existing_classroom = db.query(Classroom).filter(Classroom.name == data.name).first()
+    if existing_classroom:
+        raise HTTPException(
+            status_code=400, detail="Classroom with this name already exists."
+        )
+
     try:
         return classroom_service.register_classroom(db, data)
     except ValueError as e:
@@ -66,9 +78,7 @@ def get_classroom_route(classroom_id: int, db: Session = Depends(get_db)):
 
 
 @router.put("/{classroom_id}", response_model=ClassroomOut)
-def update_classroom_route(
-    classroom_id: int, updates: ClassroomUpdate, db: Session = Depends(get_db)
-):
+def update_classroom_route(classroom_id: int, updates: ClassroomUpdate, db: Session = Depends(get_db)):
     """
     Updates an existing classroom entry by its ID.
 
