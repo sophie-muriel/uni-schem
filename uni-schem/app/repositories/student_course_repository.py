@@ -2,7 +2,7 @@ from typing import List, Optional
 from sqlalchemy.orm import Session
 from app.models.student_course import StudentCourse
 from fastapi import HTTPException, status
-
+from app.models.course import Course
 
 def create_student_course(db: Session, relation: StudentCourse) -> StudentCourse:
     """
@@ -98,21 +98,24 @@ def get_courses_by_student_id(db: Session, student_id: int) -> List[StudentCours
     return db.query(StudentCourse).filter(StudentCourse.student_id == student_id).all()
 
 
-def delete_student_course(db: Session, relation_id: int) -> bool:
+def delete_student_course(db: Session, course_id: int) -> bool:
     """
-    Deletes an enrollment by its ID.
+    Deletes all student-course enrollments for a specific course, 
+    and then deletes the course.
 
     Args:
         db (Session): SQLAlchemy session object.
-        relation_id (int): ID of the enrollment to delete.
+        course_id (int): ID of the course to delete.
 
     Returns:
-        bool: True if deleted, False otherwise.
+        bool: True if successfully deleted, False otherwise.
     """
-    relation = get_student_course_by_id(db, relation_id)
-    if not relation:
+    db.query(StudentCourse).filter(StudentCourse.course_id == course_id).delete(synchronize_session=False)
+
+    course = db.query(Course).filter(Course.course_id == course_id).first()
+    if not course:
         return False
 
-    db.delete(relation)
+    db.delete(course)
     db.commit()
     return True
