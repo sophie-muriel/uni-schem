@@ -3,8 +3,7 @@ from sqlalchemy.orm import Session
 from app.models.student import Student
 from app.schemas.student import StudentCreate, StudentUpdate
 from app.repositories import student_repository
-from fastapi import HTTPException
-
+from fastapi import HTTPException, status
 
 def register_student(db: Session, data: StudentCreate) -> Student:
     """
@@ -18,13 +17,19 @@ def register_student(db: Session, data: StudentCreate) -> Student:
         Student: The newly created student object.
 
     Raises:
-        HTTPException: If a student with the same DNI already exists.
+        HTTPException: If a student with the same DNI or email already exists.
     """
-    existing_student_by_dni = db.query(Student).filter(
-        Student.dni == data.dni).first()
+    existing_student_by_dni = db.query(Student).filter(Student.dni == data.dni).first()
     if existing_student_by_dni:
         raise HTTPException(
-            status_code=400, detail="Student with this DNI already exists.")
+            status_code=400, detail="Student with this DNI already exists."
+        )
+
+    existing_student_by_email = db.query(Student).filter(Student.email == data.email).first()
+    if existing_student_by_email:
+        raise HTTPException(
+            status_code=400, detail="Student with this email already exists."
+        )
 
     new_student = Student(
         name=data.name,
@@ -33,7 +38,6 @@ def register_student(db: Session, data: StudentCreate) -> Student:
         dni=data.dni,
     )
     return student_repository.create_student(db, new_student)
-
 
 def get_student(db: Session, student_id: int) -> Optional[Student]:
     """
