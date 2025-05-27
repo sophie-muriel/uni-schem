@@ -15,7 +15,8 @@ router = APIRouter()
 @router.post("/", response_model=AvailabilityOut)
 def create_availability_route(data: AvailabilityCreate, db: Session = Depends(get_db)):
     """
-    Creates a new availability entry for a professor.
+    Creates a new availability entry for a professor after checking if the professor exists
+    and if the availability does not overlap with others.
 
     Args:
         data (AvailabilityCreate): The availability information to be registered.
@@ -29,8 +30,12 @@ def create_availability_route(data: AvailabilityCreate, db: Session = Depends(ge
     """
     try:
         return availability_service.register_availability(db, data)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e)) from e
+    except HTTPException as e:
+        db.rollback()
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="An error occurred during availability creation.")
 
 
 @router.get("/", response_model=List[AvailabilityOut])
@@ -96,7 +101,8 @@ def update_availability_route(
 @router.delete("/{availability_id}")
 def delete_availability_route(availability_id: int, db: Session = Depends(get_db)):
     """
-    Deletes a professor's availability entry by its ID.
+    Deletes a professor's availability entry by its ID. The professor associated with the availability
+    will also have their associated availabilities deleted in cascade.
 
     Args:
         availability_id (int): The unique identifier of the availability entry to delete.
