@@ -25,4 +25,4 @@ class Student(Base):
     phone = Column(String(15), nullable=True)
     dni = Column(String(20), unique=True, nullable=False)
 
-    enrollments = relationship("StudentCourse", back_populates="student")
+    enrollments = relationship("StudentCourse", back_populates="student", cascade="all, delete-orphan")
