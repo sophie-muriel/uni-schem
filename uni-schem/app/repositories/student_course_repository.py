@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.models.student_course import StudentCourse
 from fastapi import HTTPException, status
 from app.models.course import Course
+from app.models.student import Student
 
 def create_student_course(db: Session, relation: StudentCourse) -> StudentCourse:
     """
@@ -18,6 +19,13 @@ def create_student_course(db: Session, relation: StudentCourse) -> StudentCourse
     Raises:
         HTTPException: If the student is already enrolled in the course.
     """
+    student = db.query(Student).filter(Student.student_id == relation.student_id).first()
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found")
+
+    course = db.query(Course).filter(Course.course_id == relation.course_id).first()
+    if not course:
+        raise HTTPException(status_code=404, detail="Course not found")
 
     existing_relation = db.query(StudentCourse).filter(
         StudentCourse.student_id == relation.student_id,
@@ -84,6 +92,24 @@ def get_students_by_course_id(db: Session, course_id: int) -> List[StudentCourse
     return db.query(StudentCourse).filter(StudentCourse.course_id == course_id).all()
 
 
+def get_student_course_by_student_and_course(db: Session, student_id: int, course_id: int) -> Optional[StudentCourse]:
+    """
+    Retrieves the student-course relationship based on student_id and course_id.
+
+    Args:
+        db (Session): SQLAlchemy session object.
+        student_id (int): The ID of the student.
+        course_id (int): The ID of the course.
+
+    Returns:
+        Optional[StudentCourse]: The student-course relationship if found, else None.
+    """
+    return db.query(StudentCourse).filter(
+        StudentCourse.student_id == student_id,
+        StudentCourse.course_id == course_id
+    ).first()
+
+
 def get_courses_by_student_id(db: Session, student_id: int) -> List[StudentCourse]:
     """
     Retrieves all courses a specific student is enrolled in by their student ID.
@@ -98,24 +124,21 @@ def get_courses_by_student_id(db: Session, student_id: int) -> List[StudentCours
     return db.query(StudentCourse).filter(StudentCourse.student_id == student_id).all()
 
 
-def delete_student_course(db: Session, course_id: int) -> bool:
+def delete_student_course(db: Session, relation_id: int) -> bool:
     """
-    Deletes all student-course enrollments for a specific course, 
-    and then deletes the course.
+    Deletes a student-course enrollment by its ID and ensures cascading deletion of related records.
 
     Args:
         db (Session): SQLAlchemy session object.
-        course_id (int): ID of the course to delete.
+        relation_id (int): The ID of the student-course relationship to delete.
 
     Returns:
-        bool: True if successfully deleted, False otherwise.
+        bool: True if deleted, False if not found.
     """
-    db.query(StudentCourse).filter(StudentCourse.course_id == course_id).delete(synchronize_session=False)
-
-    course = db.query(Course).filter(Course.course_id == course_id).first()
-    if not course:
+    relation = get_student_course_by_id(db, relation_id)
+    if not relation:
         return False
 
-    db.delete(course)
+    db.delete(relation)
     db.commit()
     return True
