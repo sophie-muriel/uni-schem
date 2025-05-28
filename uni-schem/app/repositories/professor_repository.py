@@ -1,11 +1,11 @@
 from typing import List, Optional
 from sqlalchemy.orm import Session
 from app.models.professor import Professor
-
+from fastapi import HTTPException, status
 
 def create_professor(db: Session, professor: Professor) -> Professor:
     """
-    Adds a new professor to the database.
+    Adds a new professor to the database, validating that the email and phone are unique.
 
     Args:
         db (Session): SQLAlchemy session object.
@@ -13,7 +13,25 @@ def create_professor(db: Session, professor: Professor) -> Professor:
 
     Returns:
         Professor: The newly created professor.
+
+    Raises:
+        HTTPException: If the email or phone already exists in the database.
     """
+    existing_email = db.query(Professor).filter(Professor.email == professor.email).first()
+    if existing_email:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="A professor with this email already exists."
+        )
+
+    if professor.phone:
+        existing_phone = db.query(Professor).filter(Professor.phone == professor.phone).first()
+        if existing_phone:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="A professor with this phone number already exists."
+            )
+
     db.add(professor)
     db.commit()
     db.refresh(professor)
@@ -51,7 +69,7 @@ def update_professor(
     db: Session, professor_id: int, updates: dict
 ) -> Optional[Professor]:
     """
-    Updates an existing professor's data.
+    Updates an existing professor's data, validating email and phone uniqueness.
 
     Args:
         db (Session): SQLAlchemy session object.
@@ -64,6 +82,22 @@ def update_professor(
     professor = get_professor_by_id(db, professor_id)
     if not professor:
         return None
+
+    if 'email' in updates:
+        existing_email = db.query(Professor).filter(Professor.email == updates['email']).first()
+        if existing_email:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="A professor with this email already exists."
+            )
+
+    if 'phone' in updates:
+        existing_phone = db.query(Professor).filter(Professor.phone == updates['phone']).first()
+        if existing_phone:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="A professor with this phone number already exists."
+            )
 
     for key, value in updates.items():
         setattr(professor, key, value)
