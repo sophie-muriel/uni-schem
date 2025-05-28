@@ -66,6 +66,27 @@ def get_professor_route(professor_id: int, db: Session = Depends(get_db)):
     return professor
 
 
+@router.get("/dni/{dni}", response_model=ProfessorOut)
+def get_professor_by_dni_route(dni: str, db: Session = Depends(get_db)):
+    """
+    Retrieves a professor by their DNI.
+
+    Args:
+        dni (str): The DNI of the professor.
+        db (Session): SQLAlchemy session, injected by FastAPI.
+
+    Returns:
+        ProfessorOut: The requested professor record.
+
+    Raises:
+        HTTPException: If the professor is not found, returns a 404 Not Found error.
+    """
+    professor = professor_service.get_professor_by_dni(db, dni)
+    if not professor:
+        raise HTTPException(status_code=404, detail="Professor not found")
+    return professor
+
+
 @router.put("/{professor_id}", response_model=ProfessorOut)
 def update_professor_route(
     professor_id: int, updates: ProfessorUpdate, db: Session = Depends(get_db)
