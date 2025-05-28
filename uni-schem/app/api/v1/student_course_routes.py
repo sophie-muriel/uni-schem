@@ -49,7 +49,7 @@ def list_student_courses_route(db: Session = Depends(get_db)):
 
 
 @router.get("/course/{course_id}", response_model=List[StudentCourseOut])
-def get_students_by_course_route(course_id: int, db: Session = Depends(get_db)):
+def get_student_courses_by_course_route(course_id: int, db: Session = Depends(get_db)):
     """
     Retrieves all students enrolled in a specific course by course ID.
 
@@ -71,7 +71,7 @@ def get_students_by_course_route(course_id: int, db: Session = Depends(get_db)):
 
 
 @router.get("/student/{student_id}", response_model=List[StudentCourseOut])
-def get_courses_by_student_route(student_id: int, db: Session = Depends(get_db)):
+def get_student_courses_by_student_route(student_id: int, db: Session = Depends(get_db)):
     """
     Retrieves all courses a specific student is enrolled in by student ID.
 
