@@ -1,26 +1,47 @@
 from typing import List, Optional
 from sqlalchemy.orm import Session
+from fastapi import HTTPException, status
 from app.models.student_course import StudentCourse
 from app.schemas.student_course import StudentCourseCreate
-from app.repositories import student_course_repository
+from app.repositories import student_course_repository, student_repository, course_repository
 
 
 def register_student_course(db: Session, data: StudentCourseCreate) -> StudentCourse:
     """
-    Registers a new student-course enrollment.
+    Registers a new student-course enrollment after validating the student and course existence,
+    and checking for duplicate enrollments.
 
     Args:
         db (Session): SQLAlchemy session object.
-        data (StudentCourseCreate): Data for the new enrollment.
+        data (StudentCourseCreate): The enrollment details.
 
     Returns:
-        StudentCourse: The created enrollment.
+        StudentCourse: The created student-course enrollment.
     """
+    student = student_repository.get_student_by_id(db, data.student_id)
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found")
+
+    course = course_repository.get_course_by_id(db, data.course_id)
+    if not course:
+        raise HTTPException(status_code=404, detail="Course not found")
+
+    existing_relation = student_course_repository.get_student_course_by_student_and_course(
+        db, data.student_id, data.course_id
+    )
+    if existing_relation:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Student is already enrolled in this course."
+        )
+
     new_relation = StudentCourse(
         student_id=data.student_id,
         course_id=data.course_id
     )
+
     return student_course_repository.create_student_course(db, new_relation)
+
 
 
 def get_student_course(db: Session, relation_id: int) -> Optional[StudentCourse]:
