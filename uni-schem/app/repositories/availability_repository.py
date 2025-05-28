@@ -2,6 +2,7 @@ from typing import List, Optional
 from datetime import time
 from sqlalchemy.orm import Session
 from app.models.availability import Availability
+from app.models.professor import Professor
 from fastapi import HTTPException, status
 
 
@@ -19,15 +20,21 @@ def create_availability(db: Session, availability: Availability) -> Availability
     Raises:
         HTTPException: If the availability overlaps with an existing availability.
     """
-    existing_availability = get_availability_by_professor_and_time(
-        db, availability.professor_id, availability.day, availability.start_time,
-        availability.end_time
-    )
+    professor = db.query(Professor).filter(Professor.professor_id == availability.professor_id).first()
+    if not professor:
+        raise HTTPException(status_code=404, detail="Professor not found")
+
+    existing_availability = db.query(Availability).filter(
+        Availability.professor_id == availability.professor_id,
+        Availability.day == availability.day,
+        Availability.start_time == availability.start_time,
+        Availability.end_time == availability.end_time
+    ).first()
 
     if existing_availability:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="La disponibilidad se solapa con una disponibilidad existente."
+            detail="This professor already has availability at this time."
         )
 
     db.add(availability)
@@ -83,9 +90,7 @@ def get_availability_by_professor_and_time(
     return db.query(Availability).filter(
         Availability.professor_id == professor_id,
         Availability.day == day,
-        # The start time of the new availability should be before the existing end time
         Availability.start_time < end_time,
-        # The end time of the new availability should be after the existing start time
         Availability.end_time > start_time
     ).first()
 
@@ -122,7 +127,11 @@ def update_availability(
     if not availability:
         return None
 
-    # Update the fields with the new data
+    if 'professor_id' in updates:
+        professor = db.query(Professor).filter(Professor.professor_id == updates['professor_id']).first()
+        if not professor:
+            raise HTTPException(status_code=404, detail="Professor not found")
+
     for key, value in updates.items():
         setattr(availability, key, value)
 
@@ -133,7 +142,7 @@ def update_availability(
 
 def delete_availability(db: Session, availability_id: int) -> bool:
     """
-    Deletes an availability entry by its ID.
+    Deletes an availability entry by its ID and deletes related availability entries.
 
     Args:
         db (Session): SQLAlchemy session.
@@ -145,6 +154,8 @@ def delete_availability(db: Session, availability_id: int) -> bool:
     availability = get_availability_by_id(db, availability_id)
     if not availability:
         return False
+
+    db.query(Availability).filter(Availability.professor_id == availability.professor_id).delete(synchronize_session=False)
 
     db.delete(availability)
     db.commit()
