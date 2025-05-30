@@ -55,6 +55,24 @@ def get_availability(db: Session, availability_id: int) -> Optional[Availability
     return availability_repository.get_availability_by_id(db, availability_id)
 
 
+def get_availabilities_by_professor_id(db: Session, professor_id: int) -> List[Availability]:
+    """
+    Retrieves all availability entries for a professor by their professor_id.
+
+    Args:
+        db (Session): SQLAlchemy session.
+        professor_id (int): The ID of the professor.
+
+    Returns:
+        List[Availability]: A list of all availability records for the professor.
+    """
+    professor = professor_repository.get_professor_by_id(db, professor_id)
+    if not professor:
+        raise HTTPException(status_code=404, detail="Professor not found")
+
+    return availability_repository.get_availabilities_by_professor_id(db, professor_id)
+
+
 def list_availabilities(db: Session) -> List[Availability]:
     """
     Retrieves all availability entries in the system.
