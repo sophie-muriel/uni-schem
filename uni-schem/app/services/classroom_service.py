@@ -85,9 +85,10 @@ def get_classrooms_by_capacity(db: Session, capacity: int) -> List[Classroom]:
     return classroom_repository.get_classroom_by_capacity(db, capacity)
 
 
-def modify_classroom(db: Session, classroom_id: int, updates: ClassroomUpdate) -> Optional[Classroom]:
+def modify_classroom(db: Session, classroom_id: int, updates: ClassroomUpdate) -> Classroom:
     """
-    Updates the details of an existing classroom.
+    Updates the details of an existing classroom, ensuring name uniqueness
+    (excluding the current classroom) and valid capacity range.
 
     Args:
         db (Session): Database session.
@@ -95,11 +96,51 @@ def modify_classroom(db: Session, classroom_id: int, updates: ClassroomUpdate) -
         updates (ClassroomUpdate): The fields to update.
 
     Returns:
-        Optional[Classroom]: The updated classroom, or None if not found.
+        Classroom: The updated classroom.
+
+    Raises:
+        HTTPException: If the classroom is not found (404),
+        if a duplicate name exists (400),
+        if capacity is invalid (400), or for unexpected errors (500).
     """
-    return classroom_repository.update_classroom(
-        db, classroom_id, updates.dict(exclude_unset=True)
-    )
+    current_classroom = classroom_repository.get_classroom_by_id(db, classroom_id)
+    if not current_classroom:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Classroom not found."
+        )
+    
+    if updates.name is not None:
+        existing_duplicate_classroom = db.query(Classroom).filter(
+            Classroom.name == updates.name,
+            Classroom.classroom_id != classroom_id
+        ).first()
+
+        if existing_duplicate_classroom:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"A classroom with the name '{updates.name}' already exists."
+            )
+            
+    if updates.capacity is not None:
+        if updates.capacity < 5 or updates.capacity > 40:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Classroom capacity must be between 5 and 40."
+            )
+        
+    try:
+        updated_classroom = classroom_repository.update_classroom(
+            db, classroom_id, updates.dict(exclude_unset=True)
+        )
+        return updated_classroom
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"An unexpected error occurred during classroom modification: {e}"
+        )
 
 
 def remove_classroom(db: Session, classroom_id: int) -> bool:
