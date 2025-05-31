@@ -107,7 +107,7 @@ def get_courses_by_professor_id(db: Session, professor_id: int) -> List[Course]:
     return course_repository.get_courses_by_professor_id(db, professor_id)
 
 
-def modify_course(db: Session, course_id: int, updates: CourseUpdate) -> Course: # Cambiamos a 'Course' (no Optional)
+def modify_course(db: Session, course_id: int, updates: CourseUpdate) -> Course:
     """
     Updates a course with the provided fields, ensuring uniqueness of the course code
     if updated, and validating the existence of the associated professor.
