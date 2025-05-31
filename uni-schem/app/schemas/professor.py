@@ -76,18 +76,54 @@ class ProfessorUpdate(BaseModel):
 
     @field_validator("phone")
     def validate_phone(cls, v):
+        """
+        Validates the phone number format for updates.
+
+        Args:
+            v (str): The phone number value.
+
+        Raises:
+            ValueError: If the phone number does not have exactly 10 digits.
+
+        Returns:
+            str: The validated phone number.
+        """
         if v and not re.match(r"^\d{10}$", v):
             raise ValueError("Phone number must be exactly 10 digits")
         return v
 
     @field_validator("name")
     def validate_name(cls, v):
+        """
+        Validates the name format for updates.
+
+        Args:
+            v (str): The name value.
+
+        Raises:
+            ValueError: If the name contains characters outside letters, spaces, or apostrophes.
+
+        Returns:
+            str: The validated name.
+        """
         if v and not re.match(r"^[A-Za-z\s']+$", v):
             raise ValueError("Name must only contain letters, spaces, or apostrophes")
         return v
 
     @field_validator("dni")
     def validate_dni(cls, v):
+        """
+        Validates the DNI format for updates.
+
+        Args:
+            v (str): The DNI value.
+
+        Raises:
+            ValueError: If the DNI is not between 6 and 10 digits.
+
+        Returns:
+            str: The validated DNI.
+        """
         if v and not re.match(r"^\d{6,10}$", v):
             raise ValueError("DNI must be between 6 and 10 digits")
         return v

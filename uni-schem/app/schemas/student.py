@@ -20,6 +20,12 @@ class StudentBase(BaseModel):
 
     @validator('phone')
     def validate_phone(cls, v):
+        """
+        Validates that the phone number contains only digits and is exactly 10 digits long.
+
+        Raises:
+            ValueError: If phone is not numeric or does not have exactly 10 digits.
+        """
         if v:
             if not v.isdigit():
                 raise ValueError('Phone number must contain only digits')
@@ -29,12 +35,24 @@ class StudentBase(BaseModel):
 
     @validator('dni')
     def validate_dni(cls, v):
+        """
+        Validates that the DNI contains only digits.
+
+        Raises:
+            ValueError: If DNI contains non-digit characters.
+        """
         if not v.isdigit():
             raise ValueError('DNI must contain only digits')
         return v
 
     @validator('name')
     def validate_name(cls, v):
+        """
+        Validates that the name contains only letters and spaces (no accents or special characters).
+
+        Raises:
+            ValueError: If name contains invalid characters.
+        """
         if not re.match("^[a-zA-Z ]*$", v):
             raise ValueError('Name must contain only letters and spaces, no accents')
         return v
