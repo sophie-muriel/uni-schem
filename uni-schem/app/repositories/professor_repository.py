@@ -85,22 +85,28 @@ def update_professor(
     professor = get_professor_by_id(db, professor_id)
     if not professor:
         return None
+    
+    if 'dni' in updates:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="The DNI field cannot be updated."
+        )
 
     if 'email' in updates:
         existing_email = db.query(Professor).filter(Professor.email == updates['email']).first()
-        if existing_email:
+        if existing_email and existing_email.id != professor_id:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="A professor with this email already exists."
-            )
-
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="A professor with this email already exists."
+        )
+    
     if 'phone' in updates:
         existing_phone = db.query(Professor).filter(Professor.phone == updates['phone']).first()
-        if existing_phone:
+        if existing_phone and existing_phone.id != professor_id:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="A professor with this phone number already exists."
-            )
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="A professor with this phone number already exists."
+        )
 
     for key, value in updates.items():
         setattr(professor, key, value)

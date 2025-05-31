@@ -125,17 +125,23 @@ def modify_professor(
     Returns:
         Optional[Professor]: The updated professor if found, else None.
     """
+    if updates.dni is not None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="The DNI field cannot be updated."
+        )
+    
     if updates.email:
         existing_professor_email = db.query(Professor).filter(Professor.email == updates.email).first()
-        if existing_professor_email:
+        if existing_professor_email and existing_professor_email.id != professor_id:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="A professor with this email already exists."
-            )
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="A professor with this email already exists."
+        )
 
     if updates.phone:
         existing_professor_phone = db.query(Professor).filter(Professor.phone == updates.phone).first()
-        if existing_professor_phone:
+        if existing_professor_phone and existing_professor_phone.id != professor_id:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="A professor with this phone number already exists."
