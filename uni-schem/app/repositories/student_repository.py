@@ -7,19 +7,20 @@ from fastapi import HTTPException, status
 
 def create_student(db: Session, student: Student) -> Student:
     """
-    Adds a new student to the database after validating the DNI is unique.
+    Registers a new student in the database, validating the uniqueness of DNI and email.
 
     Args:
         db (Session): SQLAlchemy session object.
         student (Student): The student instance to add.
 
     Returns:
-        Student: The newly added student.
+        Student: The newly created student object.
 
     Raises:
-        HTTPException: If the DNI already exists in the database.
+        HTTPException:
+            - If a student with the same DNI already exists.
+            - If a student with the same email already exists.
     """
-
     existing_student = db.query(Student).filter(
         Student.dni == student.dni).first()
     if existing_student:
@@ -87,19 +88,22 @@ def update_student(
     db: Session, student_id: int, updated_data: dict
 ) -> Student:
     """
-    Updates a student by ID, ensuring email and phone uniqueness,
+    Updates a student's data by ID, validating email and phone uniqueness,
     and preventing modification of DNI.
 
     Args:
         db (Session): SQLAlchemy session object.
         student_id (int): ID of the student to update.
-        updated_data (dict): Fields to be updated.
+        updated_data (dict): Dictionary with fields to be updated.
 
     Returns:
-        Optional[Student]: The updated student or None if not found.
+        Student: The updated student object.
 
     Raises:
-        HTTPException: If updated email or phone already exists, or DNI modification is attempted.
+        HTTPException:
+            - If the student is not found.
+            - If the updated email or phone already exists for another student.
+            - If a database integrity error occurs (e.g., constraint violation).
     """
     student = get_student_by_id(db, student_id)
     

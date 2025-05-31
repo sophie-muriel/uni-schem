@@ -5,17 +5,19 @@ from fastapi import HTTPException, status
 
 def create_professor(db: Session, professor: Professor) -> Professor:
     """
-    Creates a new professor in the database, ensuring that the email and phone number are unique.
+    Registers a new professor in the database, ensuring uniqueness of email and phone number.
 
     Args:
         db (Session): SQLAlchemy session object.
         professor (Professor): The professor instance to be added.
 
     Returns:
-        Professor: The newly created professor.
+        Professor: The newly created professor object.
 
     Raises:
-        HTTPException: If the email or phone already exists in the database.
+        HTTPException:
+            - If a professor with the same email already exists.
+            - If a professor with the same phone number already exists.
     """
     existing_email = db.query(Professor).filter(Professor.email == professor.email).first()
     if existing_email:
@@ -69,18 +71,22 @@ def update_professor(
     db: Session, professor_id: int, updates: dict
 ) -> Optional[Professor]:
     """
-    Updates an existing professor, ensuring updated email and phone number are unique.
+    Updates a professor's data, ensuring email and phone number are unique,
+    and preventing DNI modification.
 
     Args:
         db (Session): SQLAlchemy session object.
         professor_id (int): The ID of the professor to update.
-        updates (dict): Dictionary containing the fields to update.
+        updates (dict): Dictionary of fields to update.
 
     Returns:
-        Optional[Professor]: The updated professor, or None if not found.
+        Optional[Professor]: The updated professor object, or None if not found.
 
     Raises:
-        HTTPException: If the updated email or phone already exists for another professor.
+        HTTPException:
+            - If a professor with the updated email already exists.
+            - If a professor with the updated phone number already exists.
+            - If an attempt is made to update the DNI field.
     """
     professor = get_professor_by_id(db, professor_id)
     if not professor:

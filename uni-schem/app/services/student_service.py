@@ -85,7 +85,8 @@ def modify_student(
 ) -> Student:
     """
     Updates a student's data, validating email and phone uniqueness,
-    and preventing DNI modification.
+    and preventing DNI modification. Raises detailed HTTP exceptions
+    for specific validation and unexpected errors.
 
     Args:
         db (Session): SQLAlchemy session.
@@ -93,10 +94,14 @@ def modify_student(
         updates (StudentUpdate): Fields to update.
 
     Returns:
-        Optional[Student]: The updated student object, if update was successful.
+        Student: The updated student object, if update was successful.
 
     Raises:
-        HTTPException: If updated email or phone already exists, or DNI modification is attempted.
+        HTTPException: 
+            - If the student is not found.
+            - If updated email or phone already exists.
+            - If DNI modification is attempted.
+            - If an unexpected error occurs during the update.
     """
     current_student = student_repository.get_student_by_id(db, student_id)
 

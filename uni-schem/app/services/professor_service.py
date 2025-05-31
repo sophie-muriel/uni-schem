@@ -9,11 +9,8 @@ from app.repositories import professor_repository
 
 def register_professor(db: Session, data: ProfessorCreate) -> Professor:
     """
-    Registers a new professor in the system.
-
-    This function checks for the uniqueness of email, phone number, and DNI 
-    before creating a new professor. It ensures the database transaction is 
-    safely rolled back if an error occurs.
+    Registers a new professor in the system, validating uniqueness of email,
+    phone number, and DNI. Rolls back the transaction if an error occurs.
 
     Args:
         db (Session): The database session.
@@ -23,8 +20,11 @@ def register_professor(db: Session, data: ProfessorCreate) -> Professor:
         Professor: The newly created professor object.
 
     Raises:
-        HTTPException: If a professor with the same email, phone, or DNI already exists,
-                       or if a database error occurs.
+        HTTPException:
+            - If a professor with the same email already exists.
+            - If a professor with the same phone number already exists.
+            - If a professor with the same DNI already exists.
+            - If a database error occurs during the creation process.
     """
     existing_professor_email = db.query(Professor).filter(Professor.email == data.email).first()
     if existing_professor_email:
@@ -115,7 +115,8 @@ def modify_professor(
     db: Session, professor_id: int, updates: ProfessorUpdate
 ) -> Optional[Professor]:
     """
-    Updates an existing professor's information, validating email and phone uniqueness.
+    Updates an existing professor's information, validating email and phone uniqueness,
+    and preventing DNI modification.
 
     Args:
         db (Session): SQLAlchemy session.
@@ -123,7 +124,13 @@ def modify_professor(
         updates (ProfessorUpdate): Fields to update (e.g., name, email, phone).
 
     Returns:
-        Optional[Professor]: The updated professor if found, else None.
+        Optional[Professor]: The updated professor if the update was successful,
+        or None if the professor was not found.
+
+    Raises:
+        HTTPException:
+            - If DNI modification is attempted.
+            - If the updated email or phone already exists for another professor.
     """
     if updates.dni is not None:
         raise HTTPException(
