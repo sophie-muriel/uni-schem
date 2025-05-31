@@ -9,17 +9,18 @@ from fastapi import HTTPException, status
 def create_schedule(db: Session, schedule: Schedule) -> Schedule:
     """
     Inserts a new schedule entry into the database after validating course and classroom existence,
-    and checking for conflicts in the timetable.
+    and checking for scheduling conflicts.
 
     Args:
-        db (Session): SQLAlchemy session.
-        schedule (Schedule): The schedule to create.
+        db (Session): SQLAlchemy session object.
+        schedule (Schedule): The schedule instance to insert.
 
     Returns:
         Schedule: The newly created schedule.
 
     Raises:
-        HTTPException: If the course or classroom does not exist or if the schedule overlaps with an existing schedule.
+        HTTPException: If the course or classroom does not exist,
+                       or if a conflict exists in the schedule for the same course or classroom.
     """
     course = db.query(Course).filter(Course.course_id == schedule.course_id).first()
     if not course:
