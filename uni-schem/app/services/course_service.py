@@ -9,7 +9,8 @@ from app.repositories import professor_repository
 
 def register_course(db: Session, data: CourseCreate) -> Course:
     """
-    Registers a new course.
+    Registers a new course, ensuring the course code is unique.
+    Course names can be repeated.
 
     Args:
         db (Session): SQLAlchemy session.
@@ -17,13 +18,21 @@ def register_course(db: Session, data: CourseCreate) -> Course:
 
     Returns:
         Course: The newly created course.
-    """
-    professor = professor_repository.get_professor_by_id(db, data.professor_id)
-    if not professor:
-        raise HTTPException(
-            status_code=404, detail="Professor not found"
-        )
 
+    Raises:
+        HTTPException: If a course with the same code already exists (400),
+        or for unexpected internal errors (500).
+    """
+    if data.code:
+        existing_course_by_code = db.query(Course).filter(
+            Course.code == data.code
+        ).first()
+        if existing_course_by_code:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"A course with code '{data.code}' already exists."
+            )
+    
     new_course = Course(
         name=data.name,
         code=data.code,
@@ -33,11 +42,13 @@ def register_course(db: Session, data: CourseCreate) -> Course:
 
     try:
         return course_repository.create_course(db, new_course)
+    except HTTPException as e:
+        raise e
     except Exception as e:
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="An error occurred while creating the course."
+            detail=f"An error occurred while creating the course: {e}"
         )
 
 
@@ -96,9 +107,10 @@ def get_courses_by_professor_id(db: Session, professor_id: int) -> List[Course]:
     return course_repository.get_courses_by_professor_id(db, professor_id)
 
 
-def modify_course(db: Session, course_id: int, updates: CourseUpdate) -> Optional[Course]:
+def modify_course(db: Session, course_id: int, updates: CourseUpdate) -> Course: # Cambiamos a 'Course' (no Optional)
     """
-    Updates a course with the provided fields.
+    Updates a course with the provided fields, ensuring uniqueness of the course code
+    if updated, and validating the existence of the associated professor.
 
     Args:
         db (Session): SQLAlchemy session.
@@ -106,19 +118,52 @@ def modify_course(db: Session, course_id: int, updates: CourseUpdate) -> Optiona
         updates (CourseUpdate): The fields to update.
 
     Returns:
-        Optional[Course]: The updated course if found, else None.
+        Course: The updated course.
+
+    Raises:
+        HTTPException: If the course to update is not found (404),
+        if the new course code already exists for another course (400),
+        if the associated professor is not found (404),
+        or for unexpected internal errors (500).
     """
-    if updates.professor_id:
+    current_course = course_repository.get_course_by_id(db, course_id)
+    if not current_course:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Course not found."
+        )
+
+    if updates.code is not None:
+        existing_course_by_code = db.query(Course).filter(
+            Course.code == updates.code
+        ).first()
+
+        if existing_course_by_code and existing_course_by_code.course_id != course_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"A course with code '{updates.code}' already exists."
+            )
+
+    if updates.professor_id is not None:
         professor = professor_repository.get_professor_by_id(db, updates.professor_id)
         if not professor:
             raise HTTPException(
-                status_code=404, detail="Professor not found"
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Professor not found."
             )
 
-    return course_repository.update_course(
-        db, course_id, updates.dict(exclude_unset=True)
-    )
-
+    try:
+        updated_course = course_repository.update_course(
+            db, course_id, updates.dict(exclude_unset=True)
+        )
+        return updated_course
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"An unexpected error occurred during course modification: {e}"
+        )
 
 def remove_course(db: Session, course_id: int) -> bool:
     """

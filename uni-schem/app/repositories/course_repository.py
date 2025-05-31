@@ -1,5 +1,6 @@
 from typing import List, Optional
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from app.models.course import Course
 from app.models.professor import Professor
 from fastapi import HTTPException, status
@@ -8,29 +9,38 @@ from app.models.schedule import Schedule
 
 def create_course(db: Session, course: Course) -> Course:
     """
-    Adds a new course to the database after validating the professor exists.
+    Adds a new course to the database.
+    Assumes business validations (like unique code and professor existence)
+    have been performed at the service layer.
 
     Args:
         db (Session): SQLAlchemy session.
         course (Course): Course instance to add.
 
     Returns:
-        Course: The created course.
+        Course: The created course with its generated ID.
 
     Raises:
-        HTTPException: If the professor does not exist.
+        HTTPException: For database integrity errors (e.g., unique constraint violation for code)
+        or other unexpected internal errors (500).
     """
-    professor = db.query(Professor).filter(Professor.professor_id == course.professor_id).first()
-    if not professor:
+    try:
+        db.add(course)
+        db.commit()
+        db.refresh(course)
+        return course
+    except IntegrityError as e:
+        db.rollback()        
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Professor not found"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Bad requestt"
         )
-
-    db.add(course)
-    db.commit()
-    db.refresh(course)
-    return course
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"An unexpected database error occurred while creating the course: {e}"
+        )
 
 
 def get_course_by_id(db: Session, course_id: int) -> Optional[Course]:
@@ -101,23 +111,32 @@ def update_course(db: Session, course_id: int, updates: dict) -> Optional[Course
         Optional[Course]: The updated course if found.
     """
     course = get_course_by_id(db, course_id)
+    
     if not course:
-        return None
-
-    if 'professor_id' in updates:
-        professor = db.query(Professor).filter(Professor.professor_id == updates['professor_id']).first()
-        if not professor:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Professor not found"
-            )
-
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Course not found."
+        )
+    
     for key, value in updates.items():
         setattr(course, key, value)
 
-    db.commit()
-    db.refresh(course)
-    return course
+    try:
+        db.commit()
+        db.refresh(course)
+        return course
+    except IntegrityError as e:
+        db.rollback()        
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Bad request"
+        )
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"An unexpected database error occurred while creating the course: {e}"
+        )
 
 
 def delete_course(db: Session, course_id: int) -> bool:
