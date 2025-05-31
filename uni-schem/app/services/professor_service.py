@@ -9,15 +9,22 @@ from app.repositories import professor_repository
 
 def register_professor(db: Session, data: ProfessorCreate) -> Professor:
     """
-    Registers a new professor, validating email, phone, and dni uniqueness.
-    Ensures that the ID doesn't get incremented in case of failure.
+    Registers a new professor in the system.
+
+    This function checks for the uniqueness of email, phone number, and DNI 
+    before creating a new professor. It ensures the database transaction is 
+    safely rolled back if an error occurs.
 
     Args:
-        db (Session): SQLAlchemy session.
-        data (ProfessorCreate): Input data for the professor.
+        db (Session): The database session.
+        data (ProfessorCreate): The data used to create the professor.
 
     Returns:
-        Professor: The newly created professor.
+        Professor: The newly created professor object.
+
+    Raises:
+        HTTPException: If a professor with the same email, phone, or DNI already exists,
+                       or if a database error occurs.
     """
     existing_professor_email = db.query(Professor).filter(Professor.email == data.email).first()
     if existing_professor_email:

@@ -5,11 +5,11 @@ from fastapi import HTTPException, status
 
 def create_professor(db: Session, professor: Professor) -> Professor:
     """
-    Adds a new professor to the database, validating that the email and phone are unique.
+    Creates a new professor in the database, ensuring that the email and phone number are unique.
 
     Args:
         db (Session): SQLAlchemy session object.
-        professor (Professor): The professor instance to insert.
+        professor (Professor): The professor instance to be added.
 
     Returns:
         Professor: The newly created professor.
@@ -69,15 +69,18 @@ def update_professor(
     db: Session, professor_id: int, updates: dict
 ) -> Optional[Professor]:
     """
-    Updates an existing professor's data, validating email and phone uniqueness.
+    Updates an existing professor, ensuring updated email and phone number are unique.
 
     Args:
         db (Session): SQLAlchemy session object.
         professor_id (int): The ID of the professor to update.
-        updates (dict): Dictionary containing fields to update.
+        updates (dict): Dictionary containing the fields to update.
 
     Returns:
         Optional[Professor]: The updated professor, or None if not found.
+
+    Raises:
+        HTTPException: If the updated email or phone already exists for another professor.
     """
     professor = get_professor_by_id(db, professor_id)
     if not professor:

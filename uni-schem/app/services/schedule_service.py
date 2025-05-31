@@ -10,7 +10,7 @@ from app.repositories import course_repository, classroom_repository
 def register_schedule(db: Session, data: ScheduleCreate) -> Schedule:
     """
     Registers a new schedule in the system after validating course and classroom existence,
-    and checking for conflicts.
+    and checking for schedule conflicts.
 
     Args:
         db (Session): SQLAlchemy session for interacting with the database.
@@ -18,6 +18,9 @@ def register_schedule(db: Session, data: ScheduleCreate) -> Schedule:
 
     Returns:
         Schedule: The newly created schedule.
+
+    Raises:
+        HTTPException: If the course or classroom does not exist, or if there are scheduling conflicts.
     """
     course = course_repository.get_course_by_id(db, data.course_id)
     if not course:
