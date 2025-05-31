@@ -132,16 +132,18 @@ def modify_professor(
         )
     
     if updates.email:
-        existing_professor_email = db.query(Professor).filter(Professor.email == updates.email).first()
-        if existing_professor_email and existing_professor_email.id != professor_id:
+        existing_professor_email = db.query(Professor).filter(
+            Professor.email == updates.email).first()
+        if existing_professor_email and existing_professor_email.professor_id != professor_id:
             raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="A professor with this email already exists."
         )
 
     if updates.phone:
-        existing_professor_phone = db.query(Professor).filter(Professor.phone == updates.phone).first()
-        if existing_professor_phone and existing_professor_phone.id != professor_id:
+        existing_professor_phone = db.query(Professor).filter(
+            Professor.phone == updates.phone).first()
+        if existing_professor_phone and existing_professor_phone.professor_id != professor_id:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="A professor with this phone number already exists."

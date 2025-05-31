@@ -1,5 +1,5 @@
 from typing import List, Optional
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session 
 from app.models.student import Student
 from app.schemas.student import StudentCreate, StudentUpdate
 from app.repositories import student_repository
@@ -82,9 +82,10 @@ def list_students(db: Session) -> List[Student]:
 
 def modify_student(
     db: Session, student_id: int, updates: StudentUpdate
-) -> Optional[Student]:
+) -> Student:
     """
-    Updates a student's data based on the provided fields.
+    Updates a student's data, validating email and phone uniqueness,
+    and preventing DNI modification.
 
     Args:
         db (Session): SQLAlchemy session.
@@ -93,10 +94,56 @@ def modify_student(
 
     Returns:
         Optional[Student]: The updated student object, if update was successful.
+
+    Raises:
+        HTTPException: If updated email or phone already exists, or DNI modification is attempted.
     """
-    return student_repository.update_student(
-        db, student_id, updates.dict(exclude_unset=True)
-    )
+    current_student = student_repository.get_student_by_id(db, student_id)
+
+    if not current_student:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Student not found."
+        )
+    
+    if updates.dni:
+        if updates.dni != current_student.dni:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Modification of DNI to a different value is not allowed."
+            )
+
+    if updates.email:
+        existing_email = db.query(Student).filter(
+            Student.email == updates.email).first()
+        if existing_email and existing_email.student_id != student_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="A student with this email already exists."
+            )
+
+    if updates.phone:
+        existing_phone = db.query(Student).filter(
+            Student.phone == updates.phone).first()
+        if existing_phone and existing_phone.student_id != student_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="A student with this phone number already exists."
+            )
+
+    try:
+        updated_student = student_repository.update_student(
+            db, student_id, updates.dict(exclude_unset=True)
+        )
+        return updated_student
+    except HTTPException as e: 
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"An unexpected error occurred: {e}"
+        )
+
 
 
 def remove_student(db: Session, student_id: int) -> bool:

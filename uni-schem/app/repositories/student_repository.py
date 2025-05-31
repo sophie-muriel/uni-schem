@@ -1,5 +1,6 @@
 from typing import List, Optional
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from app.models.student import Student
 from fastapi import HTTPException, status
 
@@ -25,6 +26,14 @@ def create_student(db: Session, student: Student) -> Student:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="A student with this DNI already exists."
+        )
+    
+    existing_student_by_email = db.query(Student).filter(
+        Student.email == student.email).first()
+    if existing_student_by_email:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="A student with this email already exists."
         )
 
     db.add(student)
@@ -76,9 +85,10 @@ def get_all_students(db: Session) -> List[Student]:
 
 def update_student(
     db: Session, student_id: int, updated_data: dict
-) -> Optional[Student]:
+) -> Student:
     """
-    Updates a student by ID.
+    Updates a student by ID, ensuring email and phone uniqueness,
+    and preventing modification of DNI.
 
     Args:
         db (Session): SQLAlchemy session object.
@@ -87,17 +97,49 @@ def update_student(
 
     Returns:
         Optional[Student]: The updated student or None if not found.
+
+    Raises:
+        HTTPException: If updated email or phone already exists, or DNI modification is attempted.
     """
     student = get_student_by_id(db, student_id)
+    
     if not student:
-        return None
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Student not found."
+        )
+
+    if "email" in updated_data:
+        existing_email = db.query(Student).filter(
+            Student.email == updated_data["email"]).first()
+        if existing_email and existing_email.student_id != student_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="A student with this email already exists."
+            )
+
+    if "phone" in updated_data:
+        existing_phone = db.query(Student).filter(
+            Student.phone == updated_data["phone"]).first()
+        if existing_phone and existing_phone.student_id != student_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="A student with this phone number already exists."
+            )
 
     for key, value in updated_data.items():
         setattr(student, key, value)
 
-    db.commit()
-    db.refresh(student)
-    return student
+    try:
+        db.commit()
+        db.refresh(student)
+        return student
+    except IntegrityError as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email or phone number already exists."
+        )
 
 
 def delete_student(db: Session, student_id: int) -> bool:
