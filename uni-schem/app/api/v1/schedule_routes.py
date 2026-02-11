@@ -31,7 +31,8 @@ def create_schedule_route(schedule: ScheduleCreate, db: Session = Depends(get_db
         raise HTTPException(status_code=e.status_code, detail=e.detail)
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail="An error occurred during schedule creation.")
+        raise HTTPException(
+            status_code=500, detail="An error occurred during schedule creation.")
 
 
 @router.get("/", response_model=List[ScheduleOut])
@@ -106,7 +107,8 @@ def get_schedules_by_classroom_id_route(classroom_id: int, db: Session = Depends
     Raises:
         HTTPException: If no schedules are found for the classroom, returns a 404 Not Found error.
     """
-    schedules = schedule_service.get_schedules_by_classroom_id(db, classroom_id)
+    schedules = schedule_service.get_schedules_by_classroom_id(
+        db, classroom_id)
     if not schedules:
         raise HTTPException(
             status_code=404, detail="No schedules found for this classroom")

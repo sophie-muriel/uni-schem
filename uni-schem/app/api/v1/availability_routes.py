@@ -35,7 +35,8 @@ def create_availability_route(data: AvailabilityCreate, db: Session = Depends(ge
         raise HTTPException(status_code=e.status_code, detail=e.detail)
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail="An error occurred during availability creation.")
+        raise HTTPException(
+            status_code=500, detail="An error occurred during availability creation.")
 
 
 @router.get("/", response_model=List[AvailabilityOut])

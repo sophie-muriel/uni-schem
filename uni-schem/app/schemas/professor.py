@@ -37,7 +37,8 @@ class ProfessorBase(BaseModel):
             ValueError: If the name contains invalid characters (e.g., accented letters or special characters).
         """
         if not re.match(r"^[A-Za-z\s']+$", v):
-            raise ValueError("Name must only contain letters, spaces, or apostrophes")
+            raise ValueError(
+                "Name must only contain letters, spaces, or apostrophes")
         return v
 
     @field_validator("dni")
@@ -107,7 +108,8 @@ class ProfessorUpdate(BaseModel):
             str: The validated name.
         """
         if v and not re.match(r"^[A-Za-z\s']+$", v):
-            raise ValueError("Name must only contain letters, spaces, or apostrophes")
+            raise ValueError(
+                "Name must only contain letters, spaces, or apostrophes")
         return v
 
     @field_validator("dni")

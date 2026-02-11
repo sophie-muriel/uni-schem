@@ -8,6 +8,7 @@ from app.models.classroom import Classroom
 
 router = APIRouter()
 
+
 @router.post("/", response_model=ClassroomOut)
 def create_classroom_route(data: ClassroomCreate, db: Session = Depends(get_db)):
     """
@@ -30,7 +31,8 @@ def create_classroom_route(data: ClassroomCreate, db: Session = Depends(get_db))
             detail="Classroom capacity must be between 5 and 40."
         )
 
-    existing_classroom = db.query(Classroom).filter(Classroom.name == data.name).first()
+    existing_classroom = db.query(Classroom).filter(
+        Classroom.name == data.name).first()
     if existing_classroom:
         raise HTTPException(
             status_code=400, detail="Classroom with this name already exists."

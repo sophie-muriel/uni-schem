@@ -20,7 +20,8 @@ def create_availability(db: Session, availability: Availability) -> Availability
     Raises:
         HTTPException: If the availability overlaps with an existing availability.
     """
-    professor = db.query(Professor).filter(Professor.professor_id == availability.professor_id).first()
+    professor = db.query(Professor).filter(
+        Professor.professor_id == availability.professor_id).first()
     if not professor:
         raise HTTPException(status_code=404, detail="Professor not found")
 
@@ -128,7 +129,8 @@ def update_availability(
         return None
 
     if 'professor_id' in updates:
-        professor = db.query(Professor).filter(Professor.professor_id == updates['professor_id']).first()
+        professor = db.query(Professor).filter(
+            Professor.professor_id == updates['professor_id']).first()
         if not professor:
             raise HTTPException(status_code=404, detail="Professor not found")
 
@@ -155,7 +157,8 @@ def delete_availability(db: Session, availability_id: int) -> bool:
     if not availability:
         return False
 
-    db.query(Availability).filter(Availability.professor_id == availability.professor_id).delete(synchronize_session=False)
+    db.query(Availability).filter(Availability.professor_id ==
+                                  availability.professor_id).delete(synchronize_session=False)
 
     db.delete(availability)
     db.commit()

@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 from app.db.database import Base
 
+
 class StudentCourse(Base):
     """
     Represents the relationship between a student and a course (enrollment).
@@ -18,9 +19,10 @@ class StudentCourse(Base):
     __tablename__ = "student_course"
 
     student_course_id = Column(Integer, primary_key=True, index=True)
-    student_id = Column(Integer, ForeignKey("student.student_id", ondelete="CASCADE"), nullable=False)
-    course_id = Column(Integer, ForeignKey("course.course_id", ondelete="CASCADE"), nullable=False)
+    student_id = Column(Integer, ForeignKey(
+        "student.student_id", ondelete="CASCADE"), nullable=False)
+    course_id = Column(Integer, ForeignKey(
+        "course.course_id", ondelete="CASCADE"), nullable=False)
 
     student = relationship("Student", back_populates="enrollments")
     course = relationship("Course", back_populates="enrollments")
-

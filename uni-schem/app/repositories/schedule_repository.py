@@ -22,14 +22,16 @@ def create_schedule(db: Session, schedule: Schedule) -> Schedule:
         HTTPException: If the course or classroom does not exist,
                        or if a conflict exists in the schedule for the same course or classroom.
     """
-    course = db.query(Course).filter(Course.course_id == schedule.course_id).first()
+    course = db.query(Course).filter(
+        Course.course_id == schedule.course_id).first()
     if not course:
         raise HTTPException(
             status_code=404,
             detail="Course not found"
         )
 
-    classroom = db.query(Classroom).filter(Classroom.classroom_id == schedule.classroom_id).first()
+    classroom = db.query(Classroom).filter(
+        Classroom.classroom_id == schedule.classroom_id).first()
     if not classroom:
         raise HTTPException(
             status_code=404,

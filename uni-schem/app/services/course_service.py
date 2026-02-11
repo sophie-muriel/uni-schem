@@ -32,7 +32,7 @@ def register_course(db: Session, data: CourseCreate) -> Course:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"A course with code '{data.code}' already exists."
             )
-    
+
     new_course = Course(
         name=data.name,
         code=data.code,
@@ -145,7 +145,8 @@ def modify_course(db: Session, course_id: int, updates: CourseUpdate) -> Course:
             )
 
     if updates.professor_id is not None:
-        professor = professor_repository.get_professor_by_id(db, updates.professor_id)
+        professor = professor_repository.get_professor_by_id(
+            db, updates.professor_id)
         if not professor:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -164,6 +165,7 @@ def modify_course(db: Session, course_id: int, updates: CourseUpdate) -> Course:
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"An unexpected error occurred during course modification: {e}"
         )
+
 
 def remove_course(db: Session, course_id: int) -> bool:
     """

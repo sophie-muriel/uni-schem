@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 from app.db.database import Base
 
+
 class Course(Base):
     """
     Represents a course taught by a professor.
@@ -24,8 +25,10 @@ class Course(Base):
     name = Column(String(100), nullable=False)
     code = Column(String(20), nullable=False)
     semester = Column(String(20), nullable=False)
-    professor_id = Column(Integer, ForeignKey("professor.professor_id"), nullable=False)
+    professor_id = Column(Integer, ForeignKey(
+        "professor.professor_id"), nullable=False)
 
     professor = relationship("Professor", back_populates="courses")
     schedules = relationship("Schedule", back_populates="course")
-    enrollments = relationship("StudentCourse", back_populates="course", cascade="all, delete-orphan")
+    enrollments = relationship(
+        "StudentCourse", back_populates="course", cascade="all, delete-orphan")

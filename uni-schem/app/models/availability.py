@@ -18,7 +18,8 @@ class Availability(Base):
     __tablename__ = "availability"
 
     availability_id = Column(Integer, primary_key=True, index=True)
-    professor_id = Column(Integer, ForeignKey("professor.professor_id", ondelete="SET NULL"), nullable=True)
+    professor_id = Column(Integer, ForeignKey(
+        "professor.professor_id", ondelete="SET NULL"), nullable=True)
     day = Column(SQLEnum(Day), nullable=False)
     start_time = Column(Time, nullable=False)
     end_time = Column(Time, nullable=False)

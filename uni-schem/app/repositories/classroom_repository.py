@@ -27,13 +27,13 @@ def create_classroom(db: Session, classroom: Classroom) -> Classroom:
             status_code=400,
             detail="A classroom with this name already exists."
         )
-    
+
     if classroom.capacity < 5 or classroom.capacity > 40:
         raise HTTPException(
             status_code=400,
             detail="Classroom capacity must be between 5 and 40."
         )
-    
+
     try:
         db.add(classroom)
         db.commit()
@@ -115,16 +115,17 @@ def update_classroom(db: Session, classroom_id: int, updates: dict) -> Optional[
 def delete_classroom(db: Session, classroom_id: int) -> bool:
     """
     Deletes a classroom and updates all related schedule entries by setting classroom_id to NULL.
-    
+
     Args:
         db (Session): SQLAlchemy session.
         classroom_id (int): ID of the classroom to delete.
-        
+
     Returns:
         bool: True if the classroom was successfully deleted, False otherwise.
     """
-    db.query(Schedule).filter(Schedule.classroom_id == classroom_id).update({"classroom_id": None}, synchronize_session=False)
-    
+    db.query(Schedule).filter(Schedule.classroom_id == classroom_id).update(
+        {"classroom_id": None}, synchronize_session=False)
+
     classroom = get_classroom_by_id(db, classroom_id)
     if not classroom:
         return False

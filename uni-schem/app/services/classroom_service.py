@@ -17,7 +17,8 @@ def register_classroom(db: Session, data: ClassroomCreate) -> Classroom:
     Returns:
         Classroom: The created classroom.
     """
-    existing_classroom_by_name = db.query(Classroom).filter(Classroom.name == data.name).first()
+    existing_classroom_by_name = db.query(Classroom).filter(
+        Classroom.name == data.name).first()
     if existing_classroom_by_name:
         raise HTTPException(
             status_code=400, detail="A classroom with this name already exists."
@@ -103,13 +104,14 @@ def modify_classroom(db: Session, classroom_id: int, updates: ClassroomUpdate) -
         if a duplicate name exists (400),
         if capacity is invalid (400), or for unexpected errors (500).
     """
-    current_classroom = classroom_repository.get_classroom_by_id(db, classroom_id)
+    current_classroom = classroom_repository.get_classroom_by_id(
+        db, classroom_id)
     if not current_classroom:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Classroom not found."
         )
-    
+
     if updates.name is not None:
         existing_duplicate_classroom = db.query(Classroom).filter(
             Classroom.name == updates.name,
@@ -121,14 +123,14 @@ def modify_classroom(db: Session, classroom_id: int, updates: ClassroomUpdate) -
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"A classroom with the name '{updates.name}' already exists."
             )
-            
+
     if updates.capacity is not None:
         if updates.capacity < 5 or updates.capacity > 40:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Classroom capacity must be between 5 and 40."
             )
-        
+
     try:
         updated_classroom = classroom_repository.update_classroom(
             db, classroom_id, updates.dict(exclude_unset=True)

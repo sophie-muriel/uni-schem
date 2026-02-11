@@ -43,7 +43,6 @@ def register_student_course(db: Session, data: StudentCourseCreate) -> StudentCo
     return student_course_repository.create_student_course(db, new_relation)
 
 
-
 def get_student_course(db: Session, relation_id: int) -> Optional[StudentCourse]:
     """
     Retrieves a student-course enrollment by its unique ID.

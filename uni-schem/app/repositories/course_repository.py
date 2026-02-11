@@ -30,7 +30,7 @@ def create_course(db: Session, course: Course) -> Course:
         db.refresh(course)
         return course
     except IntegrityError as e:
-        db.rollback()        
+        db.rollback()
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Bad requestt"
@@ -111,13 +111,13 @@ def update_course(db: Session, course_id: int, updates: dict) -> Optional[Course
         Optional[Course]: The updated course if found.
     """
     course = get_course_by_id(db, course_id)
-    
+
     if not course:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Course not found."
         )
-    
+
     for key, value in updates.items():
         setattr(course, key, value)
 
@@ -126,7 +126,7 @@ def update_course(db: Session, course_id: int, updates: dict) -> Optional[Course
         db.refresh(course)
         return course
     except IntegrityError as e:
-        db.rollback()        
+        db.rollback()
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Bad request"
@@ -142,11 +142,11 @@ def update_course(db: Session, course_id: int, updates: dict) -> Optional[Course
 def delete_course(db: Session, course_id: int) -> bool:
     """
     Deletes a course and updates all related schedule entries by setting course_id to NULL.
-    
+
     Args:
         db (Session): SQLAlchemy session.
         course_id (int): ID of the course to delete.
-        
+
     Returns:
         bool: True if the course was successfully deleted, False otherwise.
     """
@@ -154,12 +154,13 @@ def delete_course(db: Session, course_id: int) -> bool:
     if not course:
         return False
 
-    db.query(Schedule).filter(Schedule.course_id == course_id).update({"course_id": None}, synchronize_session=False)
+    db.query(Schedule).filter(Schedule.course_id == course_id).update(
+        {"course_id": None}, synchronize_session=False)
     course = db.query(Course).filter(Course.course_id == course_id).first()
-    
+
     if not course:
         return False
-    
+
     db.delete(course)
     db.commit()
     return True

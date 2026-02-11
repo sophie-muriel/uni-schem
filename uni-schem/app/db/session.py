@@ -1,5 +1,6 @@
 from .database import SessionLocal
-from fastapi import HTTPException, status # <-- ¡Importa esto!
+from fastapi import HTTPException, status  # <-- ¡Importa esto!
+
 
 def get_db():
     """

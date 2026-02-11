@@ -26,7 +26,8 @@ def register_professor(db: Session, data: ProfessorCreate) -> Professor:
             - If a professor with the same DNI already exists.
             - If a database error occurs during the creation process.
     """
-    existing_professor_email = db.query(Professor).filter(Professor.email == data.email).first()
+    existing_professor_email = db.query(Professor).filter(
+        Professor.email == data.email).first()
     if existing_professor_email:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -34,7 +35,8 @@ def register_professor(db: Session, data: ProfessorCreate) -> Professor:
         )
 
     if data.phone:
-        existing_professor_phone = db.query(Professor).filter(Professor.phone == data.phone).first()
+        existing_professor_phone = db.query(Professor).filter(
+            Professor.phone == data.phone).first()
         if existing_professor_phone:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -42,7 +44,8 @@ def register_professor(db: Session, data: ProfessorCreate) -> Professor:
             )
 
     if data.dni:
-        existing_professor_dni = db.query(Professor).filter(Professor.dni == data.dni).first()
+        existing_professor_dni = db.query(Professor).filter(
+            Professor.dni == data.dni).first()
         if existing_professor_dni:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -137,15 +140,15 @@ def modify_professor(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="The DNI field cannot be updated."
         )
-    
+
     if updates.email:
         existing_professor_email = db.query(Professor).filter(
             Professor.email == updates.email).first()
         if existing_professor_email and existing_professor_email.professor_id != professor_id:
             raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="A professor with this email already exists."
-        )
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="A professor with this email already exists."
+            )
 
     if updates.phone:
         existing_professor_phone = db.query(Professor).filter(

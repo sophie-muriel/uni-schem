@@ -9,6 +9,7 @@ from app.models.professor import Professor
 
 router = APIRouter()
 
+
 @router.post("/", response_model=CourseOut)
 def create_course_route(course: CourseCreate, db: Session = Depends(get_db)):
     """
@@ -25,19 +26,25 @@ def create_course_route(course: CourseCreate, db: Session = Depends(get_db)):
         HTTPException: If a ValueError occurs during registration, returns a 400 Bad Request
         with the corresponding error message.
     """
-    professor = db.query(Professor).filter(Professor.professor_id == course.professor_id).first()
+    professor = db.query(Professor).filter(
+        Professor.professor_id == course.professor_id).first()
     if not professor:
         raise HTTPException(status_code=404, detail="Professor not found")
-    
-    existing_course_by_name = db.query(Course).filter(Course.name == course.name).first()
-    if existing_course_by_name:
-        raise HTTPException(status_code=400, detail="Course with this name already exists.")
 
-    existing_course_by_code = db.query(Course).filter(Course.code == course.code).first()
+    existing_course_by_name = db.query(Course).filter(
+        Course.name == course.name).first()
+    if existing_course_by_name:
+        raise HTTPException(
+            status_code=400, detail="Course with this name already exists.")
+
+    existing_course_by_code = db.query(Course).filter(
+        Course.code == course.code).first()
     if existing_course_by_code:
-        raise HTTPException(status_code=400, detail="Course with this code already exists.")
-    
+        raise HTTPException(
+            status_code=400, detail="Course with this code already exists.")
+
     return course_service.register_course(db, course)
+
 
 @router.get("/", response_model=List[CourseOut])
 def list_courses_route(db: Session = Depends(get_db)):
@@ -51,6 +58,7 @@ def list_courses_route(db: Session = Depends(get_db)):
         List[CourseOut]: A list of all registered courses.
     """
     return course_service.list_courses(db)
+
 
 @router.get("/name/{course_name}", response_model=CourseOut)
 def get_course_by_name_route(course_name: str, db: Session = Depends(get_db)):
@@ -72,6 +80,7 @@ def get_course_by_name_route(course_name: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Course not found")
     return course
 
+
 @router.get("/professor/{professor_id}", response_model=List[CourseOut])
 def get_courses_by_professor_id_route(professor_id: int, db: Session = Depends(get_db)):
     """
@@ -89,8 +98,10 @@ def get_courses_by_professor_id_route(professor_id: int, db: Session = Depends(g
     """
     courses = course_service.get_courses_by_professor_id(db, professor_id)
     if not courses:
-        raise HTTPException(status_code=404, detail="No courses found for this professor")
+        raise HTTPException(
+            status_code=404, detail="No courses found for this professor")
     return courses
+
 
 @router.get("/{course_id}", response_model=CourseOut)
 def get_course_route(course_id: int, db: Session = Depends(get_db)):
@@ -112,6 +123,7 @@ def get_course_route(course_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Course not found")
     return course
 
+
 @router.put("/{course_id}", response_model=CourseOut)
 def update_course_route(course_id: int, updates: CourseUpdate, db: Session = Depends(get_db)):
     """
@@ -129,14 +141,16 @@ def update_course_route(course_id: int, updates: CourseUpdate, db: Session = Dep
         HTTPException: If the course is not found, returns a 404 Not Found error.
     """
     if updates.professor_id:
-        professor = db.query(Professor).filter(Professor.professor_id == updates.professor_id).first()
+        professor = db.query(Professor).filter(
+            Professor.professor_id == updates.professor_id).first()
         if not professor:
             raise HTTPException(status_code=404, detail="Professor not found")
-    
+
     updated = course_service.modify_course(db, course_id, updates)
     if not updated:
         raise HTTPException(status_code=404, detail="Course not found")
     return updated
+
 
 @router.delete("/{course_id}")
 def delete_course_route(course_id: int, db: Session = Depends(get_db)):

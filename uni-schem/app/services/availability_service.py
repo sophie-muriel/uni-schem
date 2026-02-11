@@ -101,7 +101,8 @@ def modify_availability(
         Optional[Availability]: The updated availability entry, or None if not found.
     """
     if updates.professor_id:
-        professor = professor_repository.get_professor_by_id(db, updates.professor_id)
+        professor = professor_repository.get_professor_by_id(
+            db, updates.professor_id)
         if not professor:
             raise HTTPException(status_code=404, detail="Professor not found")
 

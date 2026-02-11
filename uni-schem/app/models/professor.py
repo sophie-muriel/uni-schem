@@ -26,5 +26,7 @@ class Professor(Base):
     phone = Column(String(15), unique=True, nullable=False)
     dni = Column(String(20), unique=True, nullable=False)
 
-    courses = relationship("Course", back_populates="professor", cascade="all, delete-orphan")
-    availabilities = relationship("Availability", back_populates="professor", cascade="all, delete-orphan")
+    courses = relationship(
+        "Course", back_populates="professor", cascade="all, delete-orphan")
+    availabilities = relationship(
+        "Availability", back_populates="professor", cascade="all, delete-orphan")

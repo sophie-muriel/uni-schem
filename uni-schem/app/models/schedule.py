@@ -23,11 +23,13 @@ class Schedule(Base):
     __tablename__ = "schedule"
 
     schedule_id = Column(Integer, primary_key=True, index=True)
-    course_id = Column(Integer, ForeignKey("course.course_id", ondelete="SET NULL"), nullable=True)
+    course_id = Column(Integer, ForeignKey(
+        "course.course_id", ondelete="SET NULL"), nullable=True)
     day = Column(SQLEnum(Day), nullable=False)
     start_time = Column(Time, nullable=False)
     end_time = Column(Time, nullable=False)
-    classroom_id = Column(Integer, ForeignKey("classroom.classroom_id", ondelete="SET NULL"), nullable=True)
+    classroom_id = Column(Integer, ForeignKey(
+        "classroom.classroom_id", ondelete="SET NULL"), nullable=True)
 
     course = relationship("Course", back_populates="schedules")
     classroom = relationship("Classroom", back_populates="schedules")

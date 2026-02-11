@@ -5,6 +5,7 @@ from fastapi import HTTPException, status
 from app.models.course import Course
 from app.models.student import Student
 
+
 def create_student_course(db: Session, relation: StudentCourse) -> StudentCourse:
     """
     Adds a new student-course enrollment to the database after validating no duplicates.
@@ -19,11 +20,13 @@ def create_student_course(db: Session, relation: StudentCourse) -> StudentCourse
     Raises:
         HTTPException: If the student is already enrolled in the course.
     """
-    student = db.query(Student).filter(Student.student_id == relation.student_id).first()
+    student = db.query(Student).filter(
+        Student.student_id == relation.student_id).first()
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
 
-    course = db.query(Course).filter(Course.course_id == relation.course_id).first()
+    course = db.query(Course).filter(
+        Course.course_id == relation.course_id).first()
     if not course:
         raise HTTPException(status_code=404, detail="Course not found")
 

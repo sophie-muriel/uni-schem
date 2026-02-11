@@ -54,7 +54,8 @@ class StudentBase(BaseModel):
             ValueError: If name contains invalid characters.
         """
         if not re.match("^[a-zA-Z ]*$", v):
-            raise ValueError('Name must contain only letters and spaces, no accents')
+            raise ValueError(
+                'Name must contain only letters and spaces, no accents')
         return v
 
 

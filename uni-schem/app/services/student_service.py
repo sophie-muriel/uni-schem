@@ -1,9 +1,10 @@
 from typing import List, Optional
-from sqlalchemy.orm import Session 
+from sqlalchemy.orm import Session
 from app.models.student import Student
 from app.schemas.student import StudentCreate, StudentUpdate
 from app.repositories import student_repository
 from fastapi import HTTPException, status
+
 
 def register_student(db: Session, data: StudentCreate) -> Student:
     """
@@ -19,13 +20,15 @@ def register_student(db: Session, data: StudentCreate) -> Student:
     Raises:
         HTTPException: If a student with the same DNI or email already exists.
     """
-    existing_student_by_dni = db.query(Student).filter(Student.dni == data.dni).first()
+    existing_student_by_dni = db.query(Student).filter(
+        Student.dni == data.dni).first()
     if existing_student_by_dni:
         raise HTTPException(
             status_code=400, detail="Student with this DNI already exists."
         )
 
-    existing_student_by_email = db.query(Student).filter(Student.email == data.email).first()
+    existing_student_by_email = db.query(Student).filter(
+        Student.email == data.email).first()
     if existing_student_by_email:
         raise HTTPException(
             status_code=400, detail="Student with this email already exists."
@@ -38,6 +41,7 @@ def register_student(db: Session, data: StudentCreate) -> Student:
         dni=data.dni,
     )
     return student_repository.create_student(db, new_student)
+
 
 def get_student(db: Session, student_id: int) -> Optional[Student]:
     """
@@ -110,7 +114,7 @@ def modify_student(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Student not found."
         )
-    
+
     if updates.dni:
         if updates.dni != current_student.dni:
             raise HTTPException(
@@ -141,14 +145,13 @@ def modify_student(
             db, student_id, updates.dict(exclude_unset=True)
         )
         return updated_student
-    except HTTPException as e: 
+    except HTTPException as e:
         raise e
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"An unexpected error occurred: {e}"
         )
-
 
 
 def remove_student(db: Session, student_id: int) -> bool:

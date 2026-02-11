@@ -28,7 +28,7 @@ def create_student(db: Session, student: Student) -> Student:
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="A student with this DNI already exists."
         )
-    
+
     existing_student_by_email = db.query(Student).filter(
         Student.email == student.email).first()
     if existing_student_by_email:
@@ -106,7 +106,7 @@ def update_student(
             - If a database integrity error occurs (e.g., constraint violation).
     """
     student = get_student_by_id(db, student_id)
-    
+
     if not student:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
